@@ -235,6 +235,140 @@
             
               
                 
+                <a class="post-title-link" href="/2016/08/09/Ant脚本排障记/" itemprop="url">
+                  Ant脚本排障记
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-09T20:26:54+08:00" content="2016-08-09">
+              2016-08-09
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="1-事件概述"><a href="#1-事件概述" class="headerlink" title="1. 事件概述"></a>1. 事件概述</h1><p>之前的一篇日志中描述了使用Ant进行持续集成所需要的知识点和经验。说完就啪啪打脸。抽了一个周末来改造这个Build.xml，记得改造时做测试什么都是通过的。然后就把试验后模块化更强、更具可读性的脚本合并至原先发布版本的脚本中。到了该发版本的时候，继续执行这个脚本，执行到上传接口文件的步骤发现集成工程终止，屏幕上提示scp报错，错误原因是”No response from server”。原本完整可全自动执行的集成流程因为这个原因而中断，心中甚是不爽。于是就逐步查找错误的原因。修改服务器配置，修改集成脚本尝试，重新安装ant、java，重启机器等等，经过大半天的尝试，终于在快要放弃的时候发现了错误的原因，修正之后，整个版本发布的流程又可以自动运行。这次排障过程又考验了个人的知识面，将过程和经验记录下来，强化已有的知识，同时提醒自己不要再犯类似的错误。</p>
+<h1 id="2-原因分析"><a href="#2-原因分析" class="headerlink" title="2. 原因分析"></a>2. 原因分析</h1><p>脚本原来可以自动运行，中间经过几次可能的变化，然后就不能自动运行，谁都知道问题肯定出现在这几次修改的过程中，挨个查找总能找到原因。那么这里有哪些变化呢？</p>
+<ul>
+<li>修改过脚本，为了提高脚本的模块化水平、可读性，改变了变量的引用关系以及声明的位置，因为之前在单系统上试验过没问题，所以就自以为是的认为在总的脚本里这一块也没有问题；</li>
+<li>前一天开发测试网段的网络出了问题，导致办公电脑连不上开发测试服务器。听说是在更换内网的交换机，有可能是换了交换机之后网络策略或系统配置发生了变化。所以首先按这条线索往下查。</li>
+</ul>
+<h1 id="3-排障过程"><a href="#3-排障过程" class="headerlink" title="3. 排障过程"></a>3. 排障过程</h1><h1 id="3-1-重启本机"><a href="#3-1-重启本机" class="headerlink" title="3.1 重启本机"></a>3.1 重启本机</h1><p>一直对Windows的稳定性很没信心，所以先从自身查起。重启办公电脑，之后重新执行对应脚本，报同样的错误，此路不通。</p>
+<h1 id="3-2-重新安装Ant"><a href="#3-2-重新安装Ant" class="headerlink" title="3.2 重新安装Ant"></a>3.2 重新安装Ant</h1><p>某次执行的过程中，使用ant的Debug模式，最后给出异常信息，大意是发出TCP请求后没有收到回复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ant -d target</div></pre></td></tr></table></figure></p>
+<p>那么是不是这次安装的ant不稳定，时间长了之后JVM自动GC，导致某些模块无法加载出现异常。好吧，重新来过。</p>
+<ul>
+<li>重新安装JDK</li>
+<li>设置Java环境变量（上次没做，但是正常运行，设置哪些变量可百度之）</li>
+<li>重新安装Ant</li>
+<li>安装对应的插件（将插件复制到ant安装目录下的lib目录下）<br>-<br>做完之后，再次执行，同样的错误，此路也不通。</li>
+</ul>
+<h1 id="3-3-防火墙规则"><a href="#3-3-防火墙规则" class="headerlink" title="3.3 防火墙规则"></a>3.3 防火墙规则</h1><p>之前遇到过Windows默认禁止接收或发出22端口的网络包。为了安全起见，关闭服务器端的防火墙iptables，在办公电脑上设置出站规则。执行上传，Failed Again。</p>
+<p>后来想了想，应该不是防火墙的原因。因为scp和ssh一样用的是22端口，从本机远程登录没有问题的话，那么端口肯定是通的。==所以可以通过远程登录正常来认定SSH服务及其端口正常。==</p>
+<h1 id="3-4-SSH配置"><a href="#3-4-SSH配置" class="headerlink" title="3.4 SSH配置"></a>3.4 SSH配置</h1><p>之前是在另外一台机器上做的部署，现在是一台全新的机器，有可能SSH配置不同。修改/etc/ssh/sshd_config文件，重启SSH服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$service ssh restart</div></pre></td></tr></table></figure></p>
+<p>SSH登录正常，但是使用ant进行scp时报同样的错误。</p>
+<h1 id="3-5-Ant脚本SCP语法问题"><a href="#3-5-Ant脚本SCP语法问题" class="headerlink" title="3.5 Ant脚本SCP语法问题"></a>3.5 Ant脚本SCP语法问题</h1><p>SCP是Ant中的一个task，有好几种写法，可以复制单个文件，也可以复制一个文件集合(fileset)。把出问题的SCP改成fileset的方式试试，还是报错啊。这时候已经是晚上八点多，心里有点抓狂。</p>
+<h1 id="3-6-Ant变量引用"><a href="#3-6-Ant变量引用" class="headerlink" title="3.6 Ant变量引用"></a>3.6 Ant变量引用</h1><p>这时候有点破罐破摔的感觉。之前所有的测试都是在集成脚本里新增了一个名称为Debug的Target，尽量保持运行时环境的统一。还可以使用Ant的诊断模式列出运行时使用的变量及其值。我就把出问题的那个Target全部拷贝到Debug下，然后执行，发现一个很奇怪的问题，前几个SCP命令能成功，后面几个会挂掉。然后把挂掉的SCP命令改成执行成功的命令语法格式，还是会挂掉。再仔细一看，执行成功的命令参数，比如file和todir基本上是字面常量写法，失败的都是变量引用。然后把变量引用全部改成常量，执行成功。。。问题原因貌似找到了。变量发生了多级引用，==引用变量时首先要确保变量是存在的或者不为空==，但是在Ant中，如果直接把file或者todir写错，会产生异常信息，但是如果file或者todir中发生了多级引用，并且其中某一级变量出现了问题，Ant无法立即发现错误，而是继续执行。SCP task在执行过程中，没有捕获相应的异常，导致最终给出的错误信息与实际的错误大相径庭。这也算是开源软件的一个问题，测试不够全面严谨。当然发生这种错误的可能性比较小，百度之后发现有几个网页都是提问的，但是没有给出有效的解决方案。如果使用开源软件遇到了小概率事件，那么恭喜你中奖了，要么自己解决，要么回退到前一个版本。</p>
+<h1 id="4-经验积累"><a href="#4-经验积累" class="headerlink" title="4. 经验积累"></a>4. 经验积累</h1><p>对于本次排障，一个最重要的经验就是==不管是写代码还是写脚本一定要写定义变量然后再引用==。有些语言或者脚本解释器会提示变量未定义的异常，那如果像ant这样只能自认倒霉。还有一个经验就是写代码或者做设计时思路要统一。之前在设计这个集成脚本时，思路比较明确，脚本起始定义变量，定义的变量是对某一部分文件、目录或功能的抽象，后续脚本只引用变量，提高脚本的可移植性，减少对脚本后续部分的修改。当中发生过思路的变化，比如变量起初是按照类型来组织，比如前台、后台、接口之类的，后来按照系统来组织，即每个系统相关的配置聚集在一起。这样就导致变量顺序的调整，由此引发一些预期之外的异常。还有一个原因就是自己不够小心。其他语言当中的一些经验形成一些思维定势，没有充分检查依赖条件。经过本次排障，一个有意义的经验当然也是ant的一个问题，==首先要检查命令相关的参数、变量是不是有意义==。Ant目前无法单步调试，可以把变量的值打印到屏幕上，看是否符合预期。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/07/31/精益生产学习笔记/" itemprop="url">
                   精益生产学习笔记
                 </a>
@@ -624,6 +758,140 @@
             
               
                 
+                <a class="post-title-link" href="/2016/07/30/Ant脚本排障记-/" itemprop="url">
+                  Ant实战
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-07-30T23:21:00+08:00" content="2016-07-30">
+              2016-07-30
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="1-事件概述"><a href="#1-事件概述" class="headerlink" title="1. 事件概述"></a>1. 事件概述</h1><p>之前的一篇日志中描述了使用Ant进行持续集成所需要的知识点和经验。说完就啪啪打脸。抽了一个周末来改造这个Build.xml，记得改造时做测试什么都是通过的。然后就把试验后模块化更强、更具可读性的脚本合并至原先发布版本的脚本中。到了该发版本的时候，继续执行这个脚本，执行到上传接口文件的步骤发现集成工程终止，屏幕上提示scp报错，错误原因是”No response from server”。原本完整可全自动执行的集成流程因为这个原因而中断，心中甚是不爽。于是就逐步查找错误的原因。修改服务器配置，修改集成脚本尝试，重新安装ant、java，重启机器等等，经过大半天的尝试，终于在快要放弃的时候发现了错误的原因，修正之后，整个版本发布的流程又可以自动运行。这次排障过程又考验了个人的知识面，将过程和经验记录下来，强化已有的知识，同时提醒自己不要再犯类似的错误。</p>
+<h1 id="2-原因分析"><a href="#2-原因分析" class="headerlink" title="2. 原因分析"></a>2. 原因分析</h1><p>脚本原来可以自动运行，中间经过几次可能的变化，然后就不能自动运行，谁都知道问题肯定出现在这几次修改的过程中，挨个查找总能找到原因。那么这里有哪些变化呢？</p>
+<ul>
+<li>修改过脚本，为了提高脚本的模块化水平、可读性，改变了变量的引用关系以及声明的位置，因为之前在单系统上试验过没问题，所以就自以为是的认为在总的脚本里这一块也没有问题；</li>
+<li>前一天开发测试网段的网络出了问题，导致办公电脑连不上开发测试服务器。听说是在更换内网的交换机，有可能是换了交换机之后网络策略或系统配置发生了变化。所以首先按这条线索往下查。</li>
+</ul>
+<h1 id="3-排障过程"><a href="#3-排障过程" class="headerlink" title="3. 排障过程"></a>3. 排障过程</h1><h1 id="3-1-重启本机"><a href="#3-1-重启本机" class="headerlink" title="3.1 重启本机"></a>3.1 重启本机</h1><p>一直对Windows的稳定性很没信心，所以先从自身查起。重启办公电脑，之后重新执行对应脚本，报同样的错误，此路不通。</p>
+<h1 id="3-2-重新安装Ant"><a href="#3-2-重新安装Ant" class="headerlink" title="3.2 重新安装Ant"></a>3.2 重新安装Ant</h1><p>某次执行的过程中，使用ant的Debug模式，最后给出异常信息，大意是发出TCP请求后没有收到回复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ant -d target</div></pre></td></tr></table></figure></p>
+<p>那么是不是这次安装的ant不稳定，时间长了之后JVM自动GC，导致某些模块无法加载出现异常。好吧，重新来过。</p>
+<ul>
+<li>重新安装JDK</li>
+<li>设置Java环境变量（上次没做，但是正常运行，设置哪些变量可百度之）</li>
+<li>重新安装Ant</li>
+<li>安装对应的插件（将插件复制到ant安装目录下的lib目录下）<br>-<br>做完之后，再次执行，同样的错误，此路也不通。</li>
+</ul>
+<h1 id="3-3-防火墙规则"><a href="#3-3-防火墙规则" class="headerlink" title="3.3 防火墙规则"></a>3.3 防火墙规则</h1><p>之前遇到过Windows默认禁止接收或发出22端口的网络包。为了安全起见，关闭服务器端的防火墙iptables，在办公电脑上设置出站规则。执行上传，Failed Again。</p>
+<p>后来想了想，应该不是防火墙的原因。因为scp和ssh一样用的是22端口，从本机远程登录没有问题的话，那么端口肯定是通的。==所以可以通过远程登录正常来认定SSH服务及其端口正常。==</p>
+<h1 id="3-4-SSH配置"><a href="#3-4-SSH配置" class="headerlink" title="3.4 SSH配置"></a>3.4 SSH配置</h1><p>之前是在另外一台机器上做的部署，现在是一台全新的机器，有可能SSH配置不同。修改/etc/ssh/sshd_config文件，重启SSH服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$service ssh restart</div></pre></td></tr></table></figure></p>
+<p>SSH登录正常，但是使用ant进行scp时报同样的错误。</p>
+<h1 id="3-5-Ant脚本SCP语法问题"><a href="#3-5-Ant脚本SCP语法问题" class="headerlink" title="3.5 Ant脚本SCP语法问题"></a>3.5 Ant脚本SCP语法问题</h1><p>SCP是Ant中的一个task，有好几种写法，可以复制单个文件，也可以复制一个文件集合(fileset)。把出问题的SCP改成fileset的方式试试，还是报错啊。这时候已经是晚上八点多，心里有点抓狂。</p>
+<h1 id="3-6-Ant变量引用"><a href="#3-6-Ant变量引用" class="headerlink" title="3.6 Ant变量引用"></a>3.6 Ant变量引用</h1><p>这时候有点破罐破摔的感觉。之前所有的测试都是在集成脚本里新增了一个名称为Debug的Target，尽量保持运行时环境的统一。还可以使用Ant的诊断模式列出运行时使用的变量及其值。我就把出问题的那个Target全部拷贝到Debug下，然后执行，发现一个很奇怪的问题，前几个SCP命令能成功，后面几个会挂掉。然后把挂掉的SCP命令改成执行成功的命令语法格式，还是会挂掉。再仔细一看，执行成功的命令参数，比如file和todir基本上是字面常量写法，失败的都是变量引用。然后把变量引用全部改成常量，执行成功。。。问题原因貌似找到了。变量发生了多级引用，==引用变量时首先要确保变量是存在的或者不为空==，但是在Ant中，如果直接把file或者todir写错，会产生异常信息，但是如果file或者todir中发生了多级引用，并且其中某一级变量出现了问题，Ant无法立即发现错误，而是继续执行。SCP task在执行过程中，没有捕获相应的异常，导致最终给出的错误信息与实际的错误大相径庭。这也算是开源软件的一个问题，测试不够全面严谨。当然发生这种错误的可能性比较小，百度之后发现有几个网页都是提问的，但是没有给出有效的解决方案。如果使用开源软件遇到了小概率事件，那么恭喜你中奖了，要么自己解决，要么回退到前一个版本。</p>
+<h1 id="4-经验积累"><a href="#4-经验积累" class="headerlink" title="4. 经验积累"></a>4. 经验积累</h1><p>对于本次排障，一个最重要的经验就是==不管是写代码还是写脚本一定要写定义变量然后再引用==。有些语言或者脚本解释器会提示变量未定义的异常，那如果像ant这样只能自认倒霉。还有一个经验就是写代码或者做设计时思路要统一。之前在设计这个集成脚本时，思路比较明确，脚本起始定义变量，定义的变量是对某一部分文件、目录或功能的抽象，后续脚本只引用变量，提高脚本的可移植性，减少对脚本后续部分的修改。当中发生过思路的变化，比如变量起初是按照类型来组织，比如前台、后台、接口之类的，后来按照系统来组织，即每个系统相关的配置聚集在一起。这样就导致变量顺序的调整，由此引发一些预期之外的异常。还有一个原因就是自己不够小心。其他语言当中的一些经验形成一些思维定势，没有充分检查依赖条件。经过本次排障，一个有意义的经验当然也是ant的一个问题，==首先要检查命令相关的参数、变量是不是有意义==。Ant目前无法单步调试，可以把变量的值打印到屏幕上，看是否符合预期。</p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/07/24/你的职场上限究竟在哪里/" itemprop="url">
                   你的职场上限究竟在哪里?
                 </a>
@@ -749,213 +1017,6 @@
 <h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
 <li><a href="http://www.hbrchina.org/2015-11-26/3613.html" target="_blank" rel="external">http://www.hbrchina.org/2015-11-26/3613.html</a>, 这个是《哈佛商业评论》刊载文章的原版，中文翻译略作删减，整体结构还是比较完整的。</li>
 <li><a href="http://www.mbachina.com/html/zhaopin/201606/93609.html" target="_blank" rel="external">http://www.mbachina.com/html/zhaopin/201606/93609.html</a>, 这个是MBAChina网站上刊载的文章，优点是有少量的英文和插图，内容比官方网站的版本少了一些，但是不影响整体阅读效果。</li>
-</ul>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2016/07/24/精益生产/" itemprop="url">
-                  未命名
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-24T17:13:04+08:00" content="2016-07-24">
-              2016-07-24
-            </time>
-          </span>
-
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <p>精益生产（Lean Production），简称“精益”，是衍生自丰田生产方式的一种管理哲学。精益生产理论和生产管理体系仍在不断演化发展当中，涉及库存控制、生产计划管理、流程改进、成本管理、员工素养养成、供应链协同优化、产品生命周期管理（产品概念设计、产品开发、生产线设计、工作台设计、作业方法设计和改进）、质量管理、设备资源和人力资源管理、市场开发及销售管理等企业经营管理设计的诸多层面。</p>
-<p>精益生产是通过系统结构、人员组织、运行方式和市场供求等方面的变革，使生产系统能很快适应用户需求不断变化，并能使生产过程中一切无用、多余的东西被精简，最终达到包括市场供销在内的生产的各方面最好结果的一种生产管理方式。与传统的大生产方式不同，其特色是“多品种”，“小批量”。</p>
-<h1 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h1><p>日本丰田准时化生产JIT（Just in Time），直到20世纪60年代逐步完善而形成的。</p>
-<h1 id="产生"><a href="#产生" class="headerlink" title="产生"></a>产生</h1><p>大规模生产方式以标准化、大批量生产来降低生产成本，提高生产效率。但是无法满足市场需求多样化的发展形势。同时，日本的社会文化背景与美国不同，如家族观念、服从纪律、团队精神、缺少外籍工人、不自由散漫、不强调个人主义等。丰田生产方式反映了日本在重复性劳动生产过程中的管理思想。其指导细想是，通过生产过程整体优化，改进技术，理顺物流，杜绝超量生产，消除无效劳动和浪费，有效利用资源，降低成本，改善质量，达到用最少的投入实现最大产出的目的。</p>
-<h1 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h1><p>基本思想是Just In Time（JIT），“旨在需要的时候，按需要的量，生产所需的产品”。</p>
-<p>核心：</p>
-<ol>
-<li>追求零库存</li>
-<li>追求快速反应，及快速应对市场的变化</li>
-<li>企业内外环境的和谐统一</li>
-<li>人本主义<ul>
-<li>充分尊重员工</li>
-<li>重视培训</li>
-<li>共同协作</li>
-</ul>
-</li>
-</ol>
-<h1 id="效果和优势"><a href="#效果和优势" class="headerlink" title="效果和优势"></a>效果和优势</h1><p>都是些数据，无法证明真假，也没有表明具体应用的行业或领域，暂时忽略。</p>
-<h1 id="终极目标"><a href="#终极目标" class="headerlink" title="终极目标"></a>终极目标</h1><p>“零浪费”，具体表现在PICQMDS七个方面。</p>
-<ol>
-<li>零转产工时浪费（Products：多品种混流生产）</li>
-<li>零库存（Inventory：消减库存）</li>
-<li>零浪费（Cost：全面成本控制）</li>
-<li>零不良（Quality：高品质）</li>
-<li>零故障（Maintenance：提高运转率）</li>
-<li>零停滞（Delivery：快速反应、短交期）</li>
-<li>零灾害（Safety：安全第一）</li>
-</ol>
-<h1 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h1><ul>
-<li>消除八大浪费<ul>
-<li>过量生产</li>
-<li>等待时间</li>
-<li>运输</li>
-<li>库存</li>
-<li>过程（工序）</li>
-<li>动作</li>
-<li>产品缺陷</li>
-<li>忽视员工创造力</li>
-</ul>
-</li>
-<li>关注流程，提高总体效益</li>
-<li>建立无间断流程以快速应变</li>
-<li>降低库存</li>
-<li>全过程的高质量，一次做对</li>
-<li>基于顾客需求的拉动生产</li>
-<li>标准化与工作创新</li>
-<li>尊重员工，给员工授权</li>
-<li>团队工作</li>
-<li>满足顾客需要</li>
-<li>精益供应链</li>
-<li>“自我反省”和“现地现物”</li>
-</ul>
-<h1 id="改善原则"><a href="#改善原则" class="headerlink" title="改善原则"></a>改善原则</h1><ul>
-<li>取消（Eliminate）</li>
-<li>合并（Combine）</li>
-<li>重拍（Rearrange）</li>
-<li>简化（Simplify）</li>
-</ul>
-<h1 id="实质"><a href="#实质" class="headerlink" title="实质"></a>实质</h1><ul>
-<li>一种生产方式<ul>
-<li>最大限度的减少企业生产所占用的资源和降低企业管理和运营成本为主要目标</li>
-</ul>
-</li>
-<li>一种理念</li>
-<li>一种文化</li>
-</ul>
-<h1 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h1><p>与传统生产方式的区别主要表现为：</p>
-<ul>
-<li>改变了品质控制手段</li>
-<li>消灭（减少）了各种缓冲区</li>
-<li>增加了职工的参与感和责任感</li>
-<li>培训职工并与职工交流</li>
-<li>仅在需要的地方采用自动化</li>
-<li>精益组织结构</li>
-</ul>
-<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><ul>
-<li>管理人员同作业人员的观念没有改变</li>
-<li>急功近利</li>
-<li>没找到好的切入点</li>
-<li>样板区先行</li>
-<li>现场“5S”没做好<ul>
-<li>5S是整理、整顿、清扫、清洁、素养的缩写</li>
-</ul>
-</li>
-<li>实施过程遇到困难就停滞不前</li>
-<li>投入资金太多</li>
-<li>缺乏整体配合</li>
-</ul>
-<h1 id="实施步骤"><a href="#实施步骤" class="headerlink" title="实施步骤"></a>实施步骤</h1><ul>
-<li>选择要改进的关键流程</li>
-<li>画出价值流程图</li>
-<li>开展持续改进研讨会</li>
-<li>营造企业文化</li>
-<li>推广到整个企业</li>
-</ul>
-<h1 id="管理原则"><a href="#管理原则" class="headerlink" title="管理原则"></a>管理原则</h1><ol>
-<li>管理决策必须以长期理念为基础，即使必须因此牺牲短期财务目标也在所不惜</li>
-<li>建立无间断的作业流程以使问题浮现</li>
-<li>使用“后拉式制度”以避免生产过剩</li>
-<li>使工作负荷平均（平准化）</li>
-<li>建立立即暂停以解决问题、一开始就重视品管的文化</li>
-<li>职务工作的标准化是持续改善与授权员工的基础</li>
-<li>使用视觉管控，使问题无从隐藏</li>
-<li>使用可靠的、已经经过充分测试的技术以支持人员及流程</li>
-<li>栽培彻底了解并拥抱公司理念的员工成为领导者，病史他们能教导其他员工</li>
-<li>栽培与发展信奉公司理念的杰出人才与团队</li>
-<li>重视公司的事业伙伴与供货商网络，挑战他们，并帮助他们改善</li>
-<li>亲临现场查看以彻底了解情况（现地现物）</li>
-<li>决策不急躁，以共识为基础，彻底考虑所有可能选择，快速执行决策</li>
-<li>透过不断的省思与持续改善，以变成一个学习型组织</li>
-</ol>
-<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
-<li><a href="http://baike.baidu.com/link?url=c7PwHIb4FmVOxV5weKB_JiAkYxisZrhbACuIEw7BefDUumKqABcuUMIagRgE3_DaxpvKN0LabWpsWb2f08-ecZnIGrO-dIV47Xtuk9Mo6845afUDo-Rncrj7MU5QY9XOnxGmgC8Grx4rqaNaSRkywK" target="_blank" rel="external">http://baike.baidu.com/link?url=c7PwHIb4FmVOxV5weKB_JiAkYxisZrhbACuIEw7BefDUumKqABcuUMIagRgE3_DaxpvKN0LabWpsWb2f08-ecZnIGrO-dIV47Xtuk9Mo6845afUDo-Rncrj7MU5QY9XOnxGmgC8Grx4rqaNaSRkywK</a>, 百度百科</li>
 </ul>
 
           
@@ -1149,7 +1210,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">5</span>
+              <span class="site-state-item-count">6</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
