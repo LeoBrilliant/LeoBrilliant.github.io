@@ -235,6 +235,187 @@
             
               
                 
+                <a class="post-title-link" href="/2016/08/10/25匹马和5根跑道/" itemprop="url">
+                  25匹马和5根跑道
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-10T21:03:20+08:00" content="2016-08-10">
+              2016-08-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="1-问题及背景"><a href="#1-问题及背景" class="headerlink" title="1. 问题及背景"></a>1. 问题及背景</h1><p>有次去一家创业公司面试，其本地负责人问道：有25匹马和5根跑道，最少需要举办多少场比赛能选出跑的最快的三匹马。这应该是一道比较常见的面试题。当时为了求快，就给出了最普通的解法，25匹马分成五组比赛，每组淘汰后两名，将晋级的选手再次分组，不够5匹马的小组允许轮空，简单算下来需要12次比赛。面试官一听，“什么？12次？我告诉你，最少需要7次。你先想出一种8次的解法吧。”后来经过一番思考，给出一种接近7次的解法，但是参数选错了。他说，“时间差不多了。今天就先到这里吧，草稿纸你可以带回去，再想想有没有更好的解法。”很显然，挂了。不过思考这道题的过程觉得有点意思，记下来留念。</p>
+<h1 id="2-最普通的解法"><a href="#2-最普通的解法" class="headerlink" title="2. 最普通的解法"></a>2. 最普通的解法</h1><p>有5根跑道，意味着每次最多有5匹马赛跑。按最最一般的赛制，淘汰赛，每5匹马比赛取前三名进入下一轮，淘汰后两名。下一轮按照相同的方式举行淘汰赛，直到取出最快的前三名。具体运算过程如下。</p>
+<p>第一轮，举办5次淘汰赛，剩下15匹马；<br>第二轮，举办3次淘汰赛，剩下9匹马；<br>第三轮，举办2次淘汰赛，剩下6匹马；<br>第四轮，举办1次淘汰赛，剩下4匹马；<br>第五轮，举办1次淘汰赛，剩下3匹马。</p>
+<p>总共需要举行12次比赛。这种算法，小学生都能算出来。</p>
+<h1 id="3-最没有人性的解法"><a href="#3-最没有人性的解法" class="headerlink" title="3. 最没有人性的解法"></a>3. 最没有人性的解法</h1><p>面试官说最少只需要7次的时候，心里有点慌。脑子里冒出一些奇怪的想法。如果是举办循环赛，就是通常所说的车轮战，次数是多还是少呢？试一把。假设马儿体力很好，一天能跑很多次，而且每次跑出的成绩都一样。</p>
+<p>第一场，举办1场比赛，淘汰2匹马，3匹马晋级下一场，剩下20匹马还没比赛；<br>那么剩下每次都要从20匹马中选2匹马出来比赛，比完还需要10场，加上前1场，总共需要11场比赛。</p>
+<p>有进步哦，少了一场。问题是假设不一定成立。如果最后选出来的快马就是第一场比赛晋级的马，那么它们都要多跑十场。不光马会吐血，骑手也会吐血吧。</p>
+<h1 id="4-接近最优的解法"><a href="#4-接近最优的解法" class="headerlink" title="4. 接近最优的解法"></a>4. 接近最优的解法</h1><p>后来想到一个问题，编程算法什么的最重要的是不要做重复的计算。换句话说，就是把之前运算过程中有用的信息给保留下来，下次用的时候直接读就好，而不用再算一遍。如果是循环赛，上面给出的解法已经是最优的，可以就此打住。能优化的部分只剩下淘汰赛这一种。如果要选快马，那么至少每匹马都要跑一轮，所以至少有5场淘汰赛。那么每一场比赛都会留下什么有用的信息呢？当前一轮跑过的马都会有排名，之前跑过的马相对于同一轮参赛的马也有排名。剩下的15匹马里，分别有5个第一、第二、第三名。脑子里想有点乱，稍微画出来。</p>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+</tbody>
+</table>
+<p>画出来之后，有种似曾相识的感觉，算法书上有从N个元素中选取第K小的元素？很像啊，照猫画虎。就开始胡诌了。第F轮，让5个第三名跑一把，把后两名淘汰。第G轮，让第F轮跑了前三名的同组的第一及第一名同组的第二和第三一组，取前三即为最快的三匹马。哦，算法的大概过程还依稀记得。“你确定与第F轮第五名同组的第一名不是跑的最快的那匹马吗？”“呃。。。不确定。”“那你为什么要淘汰它？”当时脑袋已经告诉运转了一个多小时，稍微想了下，说第F轮让5个第一名比，按照刚才的流程，第G轮让剩下的再比一次就能选到最快的三匹马。其实当时我也没太想清楚第G轮到底是哪几匹马参赛，就听到面试官说“时间差不多了。今天就。。。”。当时应该被这句话打击到了。怀疑前台的思路是不是有问题。回来的路上一直在想如果F轮让5个第二名跑，会是什么结果。假设F轮之后，赛马的成绩按照ABCDE来排名，前几轮赛马的位置也一起调整，就有A1 &gt; A2 &gt; A3 &gt; A4 &gt; A5， A2 &gt; B2 &gt; C2 &gt; D2 &gt; E2，那么有可能进入最终前三的是A1 ~ E1和 A2，保险起见，需要两轮才能决出最终前三。总共需要8场比赛。在地铁上想来想去，地铁都坐过站，还影响到后来约妹子的心情。</p>
+<h1 id="5-最优解法"><a href="#5-最优解法" class="headerlink" title="5. 最优解法"></a>5. 最优解法</h1><p>晚上回去，问了几个算法大牛。有人回说5次就够了，因为有表。。。好吧，假设我们处在原始社会，没有精确的计时器。百度上也有很多答案，但是感觉都不靠谱，或者说都像我前面的接近最优的解法，没有一个给出很明确的答案说能在7次完成。而我自己也在想，如果F轮让所有第二名的跑，上面给出的解法是最优的。如果F轮让所有第三名跑，不可能比前一种解法的次数少，因为剩下的不确定的元素更多。所以，F轮肯定是让所有第一名的比赛，但是具体怎么跑，当时脑力耗尽，想不出。只推到A1是跑的最快的马，最后一轮要选出第二和第三快的马。临睡前，一个大牛给出了解法，然后我被另一个大牛鄙视了：F轮让所有第一名跑，A1是跑的最快的马；G轮让B1、C1、A2、B2、A3跑，取前两名，可得最快的三匹马。。。</p>
+<h1 id="6-思路总结"><a href="#6-思路总结" class="headerlink" title="6. 思路总结"></a>6. 思路总结</h1><ol>
+<li>利用已经获得信息，减少重复计算；</li>
+<li>尽快缩小选择（排序）的范围，可以使用分治、贪心等方法；</li>
+<li>数据的大小关系（排序）可以用树来表示，更一般的就是图。拿最优解法来说，选出最快的一匹马后，所有与A1距离小于或等于2的节点都有可能是前三名的候选者，幸运的是候选者正好是5个。</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/08/09/Ant脚本排障记/" itemprop="url">
                   Ant脚本排障记
                 </a>
@@ -758,140 +939,6 @@
             
               
                 
-                <a class="post-title-link" href="/2016/07/30/Ant脚本排障记-/" itemprop="url">
-                  Ant实战
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            <span class="post-meta-item-icon">
-              <i class="fa fa-calendar-o"></i>
-            </span>
-            <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-07-30T23:21:00+08:00" content="2016-07-30">
-              2016-07-30
-            </time>
-          </span>
-
-          
-            <span class="post-category" >
-              &nbsp; | &nbsp;
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-              
-                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/技术/" itemprop="url" rel="index">
-                    <span itemprop="name">技术</span>
-                  </a>
-                </span>
-
-                
-                
-
-              
-            </span>
-          
-
-          
-            
-          
-
-          
-
-          
-          
-
-          
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <h1 id="1-事件概述"><a href="#1-事件概述" class="headerlink" title="1. 事件概述"></a>1. 事件概述</h1><p>之前的一篇日志中描述了使用Ant进行持续集成所需要的知识点和经验。说完就啪啪打脸。抽了一个周末来改造这个Build.xml，记得改造时做测试什么都是通过的。然后就把试验后模块化更强、更具可读性的脚本合并至原先发布版本的脚本中。到了该发版本的时候，继续执行这个脚本，执行到上传接口文件的步骤发现集成工程终止，屏幕上提示scp报错，错误原因是”No response from server”。原本完整可全自动执行的集成流程因为这个原因而中断，心中甚是不爽。于是就逐步查找错误的原因。修改服务器配置，修改集成脚本尝试，重新安装ant、java，重启机器等等，经过大半天的尝试，终于在快要放弃的时候发现了错误的原因，修正之后，整个版本发布的流程又可以自动运行。这次排障过程又考验了个人的知识面，将过程和经验记录下来，强化已有的知识，同时提醒自己不要再犯类似的错误。</p>
-<h1 id="2-原因分析"><a href="#2-原因分析" class="headerlink" title="2. 原因分析"></a>2. 原因分析</h1><p>脚本原来可以自动运行，中间经过几次可能的变化，然后就不能自动运行，谁都知道问题肯定出现在这几次修改的过程中，挨个查找总能找到原因。那么这里有哪些变化呢？</p>
-<ul>
-<li>修改过脚本，为了提高脚本的模块化水平、可读性，改变了变量的引用关系以及声明的位置，因为之前在单系统上试验过没问题，所以就自以为是的认为在总的脚本里这一块也没有问题；</li>
-<li>前一天开发测试网段的网络出了问题，导致办公电脑连不上开发测试服务器。听说是在更换内网的交换机，有可能是换了交换机之后网络策略或系统配置发生了变化。所以首先按这条线索往下查。</li>
-</ul>
-<h1 id="3-排障过程"><a href="#3-排障过程" class="headerlink" title="3. 排障过程"></a>3. 排障过程</h1><h1 id="3-1-重启本机"><a href="#3-1-重启本机" class="headerlink" title="3.1 重启本机"></a>3.1 重启本机</h1><p>一直对Windows的稳定性很没信心，所以先从自身查起。重启办公电脑，之后重新执行对应脚本，报同样的错误，此路不通。</p>
-<h1 id="3-2-重新安装Ant"><a href="#3-2-重新安装Ant" class="headerlink" title="3.2 重新安装Ant"></a>3.2 重新安装Ant</h1><p>某次执行的过程中，使用ant的Debug模式，最后给出异常信息，大意是发出TCP请求后没有收到回复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ant -d target</div></pre></td></tr></table></figure></p>
-<p>那么是不是这次安装的ant不稳定，时间长了之后JVM自动GC，导致某些模块无法加载出现异常。好吧，重新来过。</p>
-<ul>
-<li>重新安装JDK</li>
-<li>设置Java环境变量（上次没做，但是正常运行，设置哪些变量可百度之）</li>
-<li>重新安装Ant</li>
-<li>安装对应的插件（将插件复制到ant安装目录下的lib目录下）<br>-<br>做完之后，再次执行，同样的错误，此路也不通。</li>
-</ul>
-<h1 id="3-3-防火墙规则"><a href="#3-3-防火墙规则" class="headerlink" title="3.3 防火墙规则"></a>3.3 防火墙规则</h1><p>之前遇到过Windows默认禁止接收或发出22端口的网络包。为了安全起见，关闭服务器端的防火墙iptables，在办公电脑上设置出站规则。执行上传，Failed Again。</p>
-<p>后来想了想，应该不是防火墙的原因。因为scp和ssh一样用的是22端口，从本机远程登录没有问题的话，那么端口肯定是通的。==所以可以通过远程登录正常来认定SSH服务及其端口正常。==</p>
-<h1 id="3-4-SSH配置"><a href="#3-4-SSH配置" class="headerlink" title="3.4 SSH配置"></a>3.4 SSH配置</h1><p>之前是在另外一台机器上做的部署，现在是一台全新的机器，有可能SSH配置不同。修改/etc/ssh/sshd_config文件，重启SSH服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$service ssh restart</div></pre></td></tr></table></figure></p>
-<p>SSH登录正常，但是使用ant进行scp时报同样的错误。</p>
-<h1 id="3-5-Ant脚本SCP语法问题"><a href="#3-5-Ant脚本SCP语法问题" class="headerlink" title="3.5 Ant脚本SCP语法问题"></a>3.5 Ant脚本SCP语法问题</h1><p>SCP是Ant中的一个task，有好几种写法，可以复制单个文件，也可以复制一个文件集合(fileset)。把出问题的SCP改成fileset的方式试试，还是报错啊。这时候已经是晚上八点多，心里有点抓狂。</p>
-<h1 id="3-6-Ant变量引用"><a href="#3-6-Ant变量引用" class="headerlink" title="3.6 Ant变量引用"></a>3.6 Ant变量引用</h1><p>这时候有点破罐破摔的感觉。之前所有的测试都是在集成脚本里新增了一个名称为Debug的Target，尽量保持运行时环境的统一。还可以使用Ant的诊断模式列出运行时使用的变量及其值。我就把出问题的那个Target全部拷贝到Debug下，然后执行，发现一个很奇怪的问题，前几个SCP命令能成功，后面几个会挂掉。然后把挂掉的SCP命令改成执行成功的命令语法格式，还是会挂掉。再仔细一看，执行成功的命令参数，比如file和todir基本上是字面常量写法，失败的都是变量引用。然后把变量引用全部改成常量，执行成功。。。问题原因貌似找到了。变量发生了多级引用，==引用变量时首先要确保变量是存在的或者不为空==，但是在Ant中，如果直接把file或者todir写错，会产生异常信息，但是如果file或者todir中发生了多级引用，并且其中某一级变量出现了问题，Ant无法立即发现错误，而是继续执行。SCP task在执行过程中，没有捕获相应的异常，导致最终给出的错误信息与实际的错误大相径庭。这也算是开源软件的一个问题，测试不够全面严谨。当然发生这种错误的可能性比较小，百度之后发现有几个网页都是提问的，但是没有给出有效的解决方案。如果使用开源软件遇到了小概率事件，那么恭喜你中奖了，要么自己解决，要么回退到前一个版本。</p>
-<h1 id="4-经验积累"><a href="#4-经验积累" class="headerlink" title="4. 经验积累"></a>4. 经验积累</h1><p>对于本次排障，一个最重要的经验就是==不管是写代码还是写脚本一定要写定义变量然后再引用==。有些语言或者脚本解释器会提示变量未定义的异常，那如果像ant这样只能自认倒霉。还有一个经验就是写代码或者做设计时思路要统一。之前在设计这个集成脚本时，思路比较明确，脚本起始定义变量，定义的变量是对某一部分文件、目录或功能的抽象，后续脚本只引用变量，提高脚本的可移植性，减少对脚本后续部分的修改。当中发生过思路的变化，比如变量起初是按照类型来组织，比如前台、后台、接口之类的，后来按照系统来组织，即每个系统相关的配置聚集在一起。这样就导致变量顺序的调整，由此引发一些预期之外的异常。还有一个原因就是自己不够小心。其他语言当中的一些经验形成一些思维定势，没有充分检查依赖条件。经过本次排障，一个有意义的经验当然也是ant的一个问题，==首先要检查命令相关的参数、变量是不是有意义==。Ant目前无法单步调试，可以把变量的值打印到屏幕上，看是否符合预期。</p>
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
-      
-
-  
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
                 <a class="post-title-link" href="/2016/07/24/你的职场上限究竟在哪里/" itemprop="url">
                   你的职场上限究竟在哪里?
                 </a>
@@ -1227,7 +1274,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">10</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>

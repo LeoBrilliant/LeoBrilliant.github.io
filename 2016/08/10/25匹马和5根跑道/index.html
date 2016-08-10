@@ -1,0 +1,653 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="算法,面试题,思维训练," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 问题及背景有次去一家创业公司面试，其本地负责人问道：有25匹马和5根跑道，最少需要举办多少场比赛能选出跑的最快的三匹马。这应该是一道比较常见的面试题。当时为了求快，就给出了最普通的解法，25匹马分成五组比赛，每组淘汰后两名，将晋级的选手再次分组，不够5匹马的小组允许轮空，简单算下来需要12次比赛。面试官一听，“什么？12次？我告诉你，最少需要7次。你先想出一种8次的解法吧。”后来经过一番思考">
+<meta property="og:type" content="article">
+<meta property="og:title" content="25匹马和5根跑道">
+<meta property="og:url" content="https://leobriliiant.github.io/2016/08/10/25匹马和5根跑道/index.html">
+<meta property="og:site_name" content="IAMLEOBRILLIANT">
+<meta property="og:description" content="1. 问题及背景有次去一家创业公司面试，其本地负责人问道：有25匹马和5根跑道，最少需要举办多少场比赛能选出跑的最快的三匹马。这应该是一道比较常见的面试题。当时为了求快，就给出了最普通的解法，25匹马分成五组比赛，每组淘汰后两名，将晋级的选手再次分组，不够5匹马的小组允许轮空，简单算下来需要12次比赛。面试官一听，“什么？12次？我告诉你，最少需要7次。你先想出一种8次的解法吧。”后来经过一番思考">
+<meta property="og:updated_time" content="2016-08-10T13:06:42.707Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="25匹马和5根跑道">
+<meta name="twitter:description" content="1. 问题及背景有次去一家创业公司面试，其本地负责人问道：有25匹马和5根跑道，最少需要举办多少场比赛能选出跑的最快的三匹马。这应该是一道比较常见的面试题。当时为了求快，就给出了最普通的解法，25匹马分成五组比赛，每组淘汰后两名，将晋级的选手再次分组，不够5匹马的小组允许轮空，简单算下来需要12次比赛。面试官一听，“什么？12次？我告诉你，最少需要7次。你先想出一种8次的解法吧。”后来经过一番思考">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://leobriliiant.github.io/2016/08/10/25匹马和5根跑道/"/>
+
+  <title> 25匹马和5根跑道 | IAMLEOBRILLIANT </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IAMLEOBRILLIANT</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Run Forest! Run!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                25匹马和5根跑道
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-10T21:03:20+08:00" content="2016-08-10">
+              2016-08-10
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-问题及背景"><a href="#1-问题及背景" class="headerlink" title="1. 问题及背景"></a>1. 问题及背景</h1><p>有次去一家创业公司面试，其本地负责人问道：有25匹马和5根跑道，最少需要举办多少场比赛能选出跑的最快的三匹马。这应该是一道比较常见的面试题。当时为了求快，就给出了最普通的解法，25匹马分成五组比赛，每组淘汰后两名，将晋级的选手再次分组，不够5匹马的小组允许轮空，简单算下来需要12次比赛。面试官一听，“什么？12次？我告诉你，最少需要7次。你先想出一种8次的解法吧。”后来经过一番思考，给出一种接近7次的解法，但是参数选错了。他说，“时间差不多了。今天就先到这里吧，草稿纸你可以带回去，再想想有没有更好的解法。”很显然，挂了。不过思考这道题的过程觉得有点意思，记下来留念。</p>
+<h1 id="2-最普通的解法"><a href="#2-最普通的解法" class="headerlink" title="2. 最普通的解法"></a>2. 最普通的解法</h1><p>有5根跑道，意味着每次最多有5匹马赛跑。按最最一般的赛制，淘汰赛，每5匹马比赛取前三名进入下一轮，淘汰后两名。下一轮按照相同的方式举行淘汰赛，直到取出最快的前三名。具体运算过程如下。</p>
+<p>第一轮，举办5次淘汰赛，剩下15匹马；<br>第二轮，举办3次淘汰赛，剩下9匹马；<br>第三轮，举办2次淘汰赛，剩下6匹马；<br>第四轮，举办1次淘汰赛，剩下4匹马；<br>第五轮，举办1次淘汰赛，剩下3匹马。</p>
+<p>总共需要举行12次比赛。这种算法，小学生都能算出来。</p>
+<h1 id="3-最没有人性的解法"><a href="#3-最没有人性的解法" class="headerlink" title="3. 最没有人性的解法"></a>3. 最没有人性的解法</h1><p>面试官说最少只需要7次的时候，心里有点慌。脑子里冒出一些奇怪的想法。如果是举办循环赛，就是通常所说的车轮战，次数是多还是少呢？试一把。假设马儿体力很好，一天能跑很多次，而且每次跑出的成绩都一样。</p>
+<p>第一场，举办1场比赛，淘汰2匹马，3匹马晋级下一场，剩下20匹马还没比赛；<br>那么剩下每次都要从20匹马中选2匹马出来比赛，比完还需要10场，加上前1场，总共需要11场比赛。</p>
+<p>有进步哦，少了一场。问题是假设不一定成立。如果最后选出来的快马就是第一场比赛晋级的马，那么它们都要多跑十场。不光马会吐血，骑手也会吐血吧。</p>
+<h1 id="4-接近最优的解法"><a href="#4-接近最优的解法" class="headerlink" title="4. 接近最优的解法"></a>4. 接近最优的解法</h1><p>后来想到一个问题，编程算法什么的最重要的是不要做重复的计算。换句话说，就是把之前运算过程中有用的信息给保留下来，下次用的时候直接读就好，而不用再算一遍。如果是循环赛，上面给出的解法已经是最优的，可以就此打住。能优化的部分只剩下淘汰赛这一种。如果要选快马，那么至少每匹马都要跑一轮，所以至少有5场淘汰赛。那么每一场比赛都会留下什么有用的信息呢？当前一轮跑过的马都会有排名，之前跑过的马相对于同一轮参赛的马也有排名。剩下的15匹马里，分别有5个第一、第二、第三名。脑子里想有点乱，稍微画出来。</p>
+<table>
+<thead>
+<tr>
+<th>轮次</th>
+<th>1</th>
+<th>2</th>
+<th>3</th>
+<th>4</th>
+<th>5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>B</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>D</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+<tr>
+<td>E</td>
+<td>Y</td>
+<td>Y</td>
+<td>Y</td>
+<td>N</td>
+<td>N</td>
+</tr>
+</tbody>
+</table>
+<p>画出来之后，有种似曾相识的感觉，算法书上有从N个元素中选取第K小的元素？很像啊，照猫画虎。就开始胡诌了。第F轮，让5个第三名跑一把，把后两名淘汰。第G轮，让第F轮跑了前三名的同组的第一及第一名同组的第二和第三一组，取前三即为最快的三匹马。哦，算法的大概过程还依稀记得。“你确定与第F轮第五名同组的第一名不是跑的最快的那匹马吗？”“呃。。。不确定。”“那你为什么要淘汰它？”当时脑袋已经告诉运转了一个多小时，稍微想了下，说第F轮让5个第一名比，按照刚才的流程，第G轮让剩下的再比一次就能选到最快的三匹马。其实当时我也没太想清楚第G轮到底是哪几匹马参赛，就听到面试官说“时间差不多了。今天就。。。”。当时应该被这句话打击到了。怀疑前台的思路是不是有问题。回来的路上一直在想如果F轮让5个第二名跑，会是什么结果。假设F轮之后，赛马的成绩按照ABCDE来排名，前几轮赛马的位置也一起调整，就有A1 &gt; A2 &gt; A3 &gt; A4 &gt; A5， A2 &gt; B2 &gt; C2 &gt; D2 &gt; E2，那么有可能进入最终前三的是A1 ~ E1和 A2，保险起见，需要两轮才能决出最终前三。总共需要8场比赛。在地铁上想来想去，地铁都坐过站，还影响到后来约妹子的心情。</p>
+<h1 id="5-最优解法"><a href="#5-最优解法" class="headerlink" title="5. 最优解法"></a>5. 最优解法</h1><p>晚上回去，问了几个算法大牛。有人回说5次就够了，因为有表。。。好吧，假设我们处在原始社会，没有精确的计时器。百度上也有很多答案，但是感觉都不靠谱，或者说都像我前面的接近最优的解法，没有一个给出很明确的答案说能在7次完成。而我自己也在想，如果F轮让所有第二名的跑，上面给出的解法是最优的。如果F轮让所有第三名跑，不可能比前一种解法的次数少，因为剩下的不确定的元素更多。所以，F轮肯定是让所有第一名的比赛，但是具体怎么跑，当时脑力耗尽，想不出。只推到A1是跑的最快的马，最后一轮要选出第二和第三快的马。临睡前，一个大牛给出了解法，然后我被另一个大牛鄙视了：F轮让所有第一名跑，A1是跑的最快的马；G轮让B1、C1、A2、B2、A3跑，取前两名，可得最快的三匹马。。。</p>
+<h1 id="6-思路总结"><a href="#6-思路总结" class="headerlink" title="6. 思路总结"></a>6. 思路总结</h1><ol>
+<li>利用已经获得信息，减少重复计算；</li>
+<li>尽快缩小选择（排序）的范围，可以使用分治、贪心等方法；</li>
+<li>数据的大小关系（排序）可以用树来表示，更一般的就是图。拿最优解法来说，选出最快的一匹马后，所有与A1距离小于或等于2的节点都有可能是前三名的候选者，幸运的是候选者正好是5个。</li>
+</ol>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/算法/" rel="tag">#算法</a>
+          
+            <a href="/tags/面试题/" rel="tag">#面试题</a>
+          
+            <a href="/tags/思维训练/" rel="tag">#思维训练</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/09/Ant脚本排障记/" rel="next" title="Ant脚本排障记">
+                <i class="fa fa-chevron-left"></i> Ant脚本排障记
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="LeoBrilliant" />
+          <p class="site-author-name" itemprop="name">LeoBrilliant</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">6</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-问题及背景"><span class="nav-number">1.</span> <span class="nav-text">1. 问题及背景</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-最普通的解法"><span class="nav-number">2.</span> <span class="nav-text">2. 最普通的解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-最没有人性的解法"><span class="nav-number">3.</span> <span class="nav-text">3. 最没有人性的解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-接近最优的解法"><span class="nav-number">4.</span> <span class="nav-text">4. 接近最优的解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-最优解法"><span class="nav-number">5.</span> <span class="nav-text">5. 最优解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-思路总结"><span class="nav-number">6.</span> <span class="nav-text">6. 思路总结</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LeoBrilliant</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
