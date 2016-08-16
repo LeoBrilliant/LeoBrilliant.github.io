@@ -235,6 +235,142 @@
             
               
                 
+                <a class="post-title-link" href="/2016/08/16/在Cygwin中使用Log4CPlus/" itemprop="url">
+                  在Cygwin中使用Log4CPlus
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-16T21:47:06+08:00" content="2016-08-16">
+              2016-08-16
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h1><p>之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来有点凌乱，而且想关闭日志输出，就要注释掉对应的代码，重新编译代码，一次两次还勉强可以接受，如果要成百上千次，累积起来的等待时间还是非常漫长。不想自己从头写一个日志模块，决定在系统级的项目或代码中引入开源的日志框架，因为已经有成熟的开源代码，花点时间学习，把更多的时间留给设计和编写业务模块。</p>
+<p>在开源C++日志框架选型的时候，备选的有log4cxx、log4cplus、glog、log4cpp等。glog据说是Google出品，主页正常情况下打不开，源代码也下不到。log4cxx和log4cpp，有个是Apache基金的开源项目之一，但是感觉很久都没有发布新版本。log4cplus还比较活跃，去年研究的时候是1.1.3，现在出到1.2.0，网上说功能比较全面，应该能满足日常使用。log4*系列都是log4j的衍生品。而log4j可以说是Java日志框架的标准，那么对其他语言的派生也不会太差吧。先用起来。</p>
+<p>刚开始学log4cplus的时候，各种困难。设计复杂，支持向屏幕、文件、网络输出日志，还可以在代码中设置或者在配置文件中配置日志的选项或者格式，还有很多开关。看了很多网络上的文章，都很长，讲得也算全面吧，等到具体应用的时候，就开始各种报错。那时候用的VS2012，源代码里提供了VS2010的工程文件，项目升级之后，编译也没啥问题，但是把生成的库链接到其他项目之后，发现log4cplus相关的函数找不到。过程、步骤都没什么问题，来来回回折腾了一整天，一个偶然的机会，发现是要编译成Debug输出格式的dll，然后还是要带什么U的一个dll，我靠。这就是很多人不喜欢技术的原因，为了克服一个问题，要花去大量的时间尝试。问题解决之后在其他人看来又不是什么很有价值的问题。更多的人是在尝试中放弃了，或者根本不愿意去尝试。这也从侧面说明网络上的文章质量不高，这类基础开源项目的文档不完善。所以一直呼吁或者要求，如果要写文档，不光是自己能看懂，而且其他人也能看懂，并且照着文档一步一步做能顺利的实现文档设定的目标。</p>
+<p>对VS的厌恶程度逐步提升。现在已经切到Cygwin。这次准备在Cygwin上编译log4cplus，如果这能成功，那么在Linux上使用也没什么问题。</p>
+<h1 id="2-使用步骤"><a href="#2-使用步骤" class="headerlink" title="2. 使用步骤"></a>2. 使用步骤</h1><ol>
+<li><p>下载源代码并解压<br>从文献[1]处下载源代码，解压到Cygwin的tmp目录下。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ pwd</div><div class="line">/tmp/log4cplus-1.2.0</div></pre></td></tr></table></figure>
+</li>
+<li><p>编译并安装库及头文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ ./configure; make; make install</div><div class="line"># 库及头文件安装位置</div><div class="line"># /usr/local/include/</div><div class="line"># /usr/local/lib/</div></pre></td></tr></table></figure>
+</li>
+<li><p>项目配置<br>项目中需要加入头文件及库位置的配置，并且需要指明链接时连接log4cplus库。</p>
+</li>
+</ol>
+<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div></pre></td><td class="code"><pre><div class="line">#include &lt;log4cplus/logger.h&gt;</div><div class="line">#include &lt;log4cplus/configurator.h&gt;</div><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;log4cplus/consoleappender.h&gt;</div><div class="line">#include &lt;log4cplus/layout.h&gt;</div><div class="line">#include &lt;log4cplus/loggingmacros.h&gt;</div><div class="line">#include &lt;log4cplus/fileappender.h&gt;</div><div class="line">#include &lt;log4cplus/helpers/loglog.h&gt;</div><div class="line"></div><div class="line">#include &lt;tchar.h&gt;</div><div class="line">//#include &lt;log4cplus/helpers/sleep.h&gt;</div><div class="line"></div><div class="line">using namespace log4cplus;</div><div class="line">using namespace log4cplus::helpers;</div><div class="line">using namespace std;</div><div class="line"></div><div class="line">void Log4CPlusTest()</div><div class="line">&#123;</div><div class="line">	cout &lt;&lt; "Log4CPlusTest" &lt;&lt; endl;</div><div class="line">	SharedObjectPtr&lt;Appender&gt; appender(new ConsoleAppender());</div><div class="line"></div><div class="line">	appender-&gt;setName(LOG4CPLUS_TEXT("appender for test"));</div><div class="line"></div><div class="line">	auto_ptr&lt;Layout&gt; layout(new PatternLayout(LOG4CPLUS_TEXT("%d&#123;%m/%d/%y %H:%M:%S&#125; - %m[%l]%n")));</div><div class="line"></div><div class="line">	appender-&gt;setLayout(layout);</div><div class="line"></div><div class="line">	Logger logger = Logger::getInstance(LOG4CPLUS_TEXT("test"));</div><div class="line"></div><div class="line">	logger.addAppender(appender);</div><div class="line">	logger.setLogLevel(ALL_LOG_LEVEL);</div><div class="line"></div><div class="line">	LOG4CPLUS_DEBUG(logger, "This is the first log Message...");</div><div class="line"></div><div class="line">	sleep(1);</div><div class="line"></div><div class="line">	LOG4CPLUS_WARN(logger, "This is the Second log Message...");</div><div class="line"></div><div class="line">	return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void Log4CPlusTestLogFile()</div><div class="line">&#123;</div><div class="line">	tstring file_name = _T("Test.log");</div><div class="line">	SharedAppenderPtr appender(new FileAppender(file_name));</div><div class="line"></div><div class="line">	appender-&gt;setName("logFileTest");</div><div class="line"></div><div class="line">	Logger logger = Logger::getInstance("test.subsetof_filelog");</div><div class="line"></div><div class="line">	logger.addAppender(appender);</div><div class="line"></div><div class="line">	for(int i = 0; i &lt; 5; ++i)</div><div class="line">	&#123;</div><div class="line">		LOG4CPLUS_DEBUG(logger, "Entering loop#" &lt;&lt; i &lt;&lt; "Endline#");</div><div class="line">	&#125;</div><div class="line">	return;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">void printMsgs()</div><div class="line">&#123;</div><div class="line">	cout &lt;&lt; "Entering printMsgs()..." &lt;&lt; endl;</div><div class="line"></div><div class="line">	LogLog::getLogLog()-&gt;debug("This is a Debug statement");</div><div class="line">	LogLog::getLogLog()-&gt;warn("This is a Waring...");</div><div class="line">	LogLog::getLogLog()-&gt;error("This is a Error...");</div><div class="line"></div><div class="line">	cout &lt;&lt; "Exiting printMsgs()..." &lt;&lt; endl;</div><div class="line"></div><div class="line">	return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void Log4CPlusTestLogLog()</div><div class="line">&#123;</div><div class="line">	cout &lt;&lt; "Test begins" &lt;&lt; endl;</div><div class="line">	printMsgs();</div><div class="line"></div><div class="line">	cout &lt;&lt; "Turning on debug..." &lt;&lt; endl;</div><div class="line"></div><div class="line">	LogLog::getLogLog()-&gt;setInternalDebugging(true);</div><div class="line">	printMsgs();</div><div class="line"></div><div class="line">	cout &lt;&lt; "Turning on quiet mode..." &lt;&lt; endl;</div><div class="line">	LogLog::getLogLog()-&gt;setQuietMode(true);</div><div class="line">	printMsgs();</div><div class="line"></div><div class="line">	return;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<h1 id="3-解决的问题"><a href="#3-解决的问题" class="headerlink" title="3. 解决的问题"></a>3. 解决的问题</h1><ol>
+<li><p>LOG4CPLUS_DEBUG等宏无法解析<br>加入头文件</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;log4cplus/loggingmacros.h&gt;</span></span></div></pre></td></tr></table></figure>
+</li>
+<li><p>计算机中丢失cyglog4cplus-1-2-5.dll<br>这个应该是Cygwin自身的链接机制问题。在CMD中报错，在Eclipse CDT Terminal中无反应，退出码比较奇怪，到了Cygwin命令行中能够正常运行。去当时的编译目录，在.lib目录下还真找到了这个文件。拷贝到项目的Debug目录，再次运行，CMD和Eclipse CDT Terminal都能正常运行。所以想到，把这个文件拷贝到system32或者加入环境变量，都能解决这个问题。</p>
+</li>
+</ol>
+<h1 id="4-参考文献"><a href="#4-参考文献" class="headerlink" title="4. 参考文献"></a>4. 参考文献</h1><p>[1] <a href="https://sourceforge.net/projects/log4cplus/" target="_blank" rel="external">log4cplus</a></p>
+<p>[2] <a href="http://my.oschina.net/lovecxx/blog/185951#OSC_h3_13" target="_blank" rel="external">http://my.oschina.net/lovecxx/blog/185951#OSC_h3_13</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
                 <a class="post-title-link" href="/2016/08/16/在Redhat中使用Automake/" itemprop="url">
                   在Redhat中使用Automake
                 </a>
@@ -342,8 +478,10 @@
 </li>
 </ol>
 <h1 id="4-问题汇总"><a href="#4-问题汇总" class="headerlink" title="4. 问题汇总"></a>4. 问题汇总</h1><ol>
-<li><p>没有规则可以创建”test”需要的目标” libSo/project”。停止。<br>运行程序的Makefile.am配置错误。正确配置为</p>
-<figure class="highlight autohotkey"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">```</div><div class="line"></div><div class="line"><span class="number">2</span>. automake: required file `/config.guess' <span class="literal">not</span> found</div><div class="line">```Shell</div><div class="line">$automake --add-missing</div></pre></td></tr></table></figure>
+<li><p>没有规则可以创建”test”需要的目标” libSo/project”。停止。<br>运行程序的Makefile.am配置错误。正确配置参考前述文件内容。</p>
+</li>
+<li><p>automake: required file `/config.guess’ not found</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$automake --add-missing</div></pre></td></tr></table></figure>
 </li>
 <li><p>automake: Libtool library used but `LIBTOOL’ is undefined…</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"># 安装libtool，注意是否安装成功。在测试的过程中，磁盘空间满了，导致无法下载安装包。并没有注意到安装失败，导致相同的错误重复出现。</div><div class="line">$yum install libtool</div><div class="line"></div><div class="line"># 使libtool生效，添加必要的文件</div><div class="line">$libtoolize -f -c</div><div class="line"></div><div class="line"># 在configure.ac中添加以下语句（去掉注释）</div><div class="line"># AC_CONFIG_MACRO_DIR([m4])</div><div class="line"># AC_PROG_LIBTOOL</div><div class="line"></div><div class="line"></div><div class="line"># 重复automake的过程</div><div class="line">$aclocal</div><div class="line">$autoheader</div><div class="line">$autoconf</div><div class="line">$automake --add-missing</div><div class="line">$./configure</div><div class="line">$make</div></pre></td></tr></table></figure>
@@ -1424,7 +1562,7 @@
         <nav class="site-state motion-element">
           <div class="site-state-item site-state-posts">
             <a href="/archives">
-              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-count">8</span>
               <span class="site-state-item-name">日志</span>
             </a>
           </div>
@@ -1441,7 +1579,7 @@
           
             <div class="site-state-item site-state-tags">
               <a href="/tags">
-                <span class="site-state-item-count">12</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">标签</span>
               </a>
             </div>
