@@ -1,0 +1,610 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="笔记,数据库,Oracle," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="1. 问题描述今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Oracle关闭失败Ora-19809">
+<meta property="og:url" content="https://leobriliiant.github.io/2016/08/18/Oracle关闭失败Ora-19809/index.html">
+<meta property="og:site_name" content="IAMLEOBRILLIANT">
+<meta property="og:description" content="1. 问题描述今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功">
+<meta property="og:updated_time" content="2016-08-18T13:25:35.237Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Oracle关闭失败Ora-19809">
+<meta name="twitter:description" content="1. 问题描述今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://leobriliiant.github.io/2016/08/18/Oracle关闭失败Ora-19809/"/>
+
+  <title> Oracle关闭失败Ora-19809 | IAMLEOBRILLIANT </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IAMLEOBRILLIANT</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Run Forest! Run!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Oracle关闭失败Ora-19809
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-18T21:24:08+08:00" content="2016-08-18">
+              2016-08-18
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h1 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h1><p>今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功能，剩下二三十G空间去哪里了？根据经验，看了下几个可能生成日志比较多的用户，都没有进程在运行，那么这些磁盘应该是被Oracle吃了。到Oracle目录下，执行了清理空间的脚本，就是通过sqlplus执行一些命令，看到屏幕上打出&gt;shutdown immediate; 许久，根据经验，Oracle关闭出现状况。去看Oracle日志，系统在飞速的写一条错误信息，大意是归档日志文件大小达到了限制，写入某条归档日志失败，错误号ORA-19809，后面跟了几个解决方案。因为现在是在关闭的过程中，sqlplus能够登录但是没有办法进行操作，报”shutdown in progress xxx”，输入&gt;shutdown abort;都报”ORA-01031 insufficient privileges”，RMAN也登录不上。几乎绝望。为了不影响开发进度，让同事连其他环境。我决定凭借使用Oracle多年的经验，看能否挽救该环境于危亡之际，不行就重置。借助百度与之前的积累，成功让该环境正常运行，代价是删除了之前的还原点，对开发测试没有实际影响，心中略有成就感。特把拯救过程记录下来。不过需要提醒，在生产环境中慎用。</p>
+<h1 id="2-详细步骤"><a href="#2-详细步骤" class="headerlink" title="2. 详细步骤"></a>2. 详细步骤</h1><ol>
+<li>关闭其他数据库实例</li>
+</ol>
+<p>为了降低复原操作对其他数据库数据的影响，应当先关闭其他数据库，防止数据异常。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$export ORACLE_SID=xxx</div><div class="line">$sqlplus / as sysdba</div><div class="line">&gt;shutdown immediate;</div></pre></td></tr></table></figure></p>
+<ol>
+<li>杀死Oracle进程</li>
+</ol>
+<p>这其实是非常有风险的一步操作，因为当前Oracle有可能写入非常重要的数据，强行杀死进程，导致一些缓存在内存中的数据没有写回到磁盘上，也可能导致日志不完整，一些依赖于日志的操作失效。但是前面也说了，rman登录失败，sqlplus操作也是不成功。我也只能强杀进程了。这也是之前正常关闭其他数据库实例的原因，防止误杀。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$pkill -9 oracle</div><div class="line"># 这种方式有个问题，就是一下把所有的Oracle进程全杀掉，然后用sqlplus启动Oracle时会报ORA-01012 Not logged on. 等了大约几分钟，再次启动就OK了。</div><div class="line"># 晚上搜到另一种方式。</div><div class="line">$ps -ef | grep ora_dbw0_$ORACLE_SID</div><div class="line">$kill -9 pid</div></pre></td></tr></table></figure></p>
+<ol>
+<li>重新启动Oracle</li>
+</ol>
+<p>正常启动Oracle，mount之后就停止，报了一个错误，ORA-38760: 此数据库实例无法启用闪回数据库。这就是前面说的，归档日志格式错误。还是上网搜。先以dba身份登录到Oracle中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt;alter database flashback off;</div><div class="line">&gt;select name from v$restore_point;</div><div class="line">- 查看还原点的名称，假设为rp_name</div><div class="line">&gt;drop restore point re_name;</div><div class="line">&gt;alter database open;</div><div class="line">- 数据库正常启动</div></pre></td></tr></table></figure></p>
+<ol>
+<li>删除归档日志</li>
+</ol>
+<p>造成此次问题的主要原因是归档日志满了，还是赶紧清理没用的日志。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$export ORACLE_SID=xxx</div><div class="line">$rman target / nocatalog</div><div class="line">&gt;crosscheck archivelog all;</div><div class="line">&gt;delete archivelog all;</div></pre></td></tr></table></figure></p>
+<ol>
+<li>重设还原点</li>
+</ol>
+<p>也没什么难点，就是一些命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">$export ORACLE_SID=xxx</div><div class="line">$sqlplus / as sysdba</div><div class="line">&gt;shutdown immediate;</div><div class="line">&gt;startup mount;</div><div class="line">- 下面一步如果曾经做过可以省略</div><div class="line">&gt;alter database archivelog;</div><div class="line">- 因为前面关了，所以打开</div><div class="line">&gt;alter database flashback on;</div><div class="line"></div><div class="line">&gt;select flashback_on from v$database;</div><div class="line">- 创建还原点</div><div class="line">&gt;create restore point xxxx guarantee flashback datbase;</div><div class="line">&gt;alter database open;</div></pre></td></tr></table></figure></p>
+<h1 id="3-经验教训"><a href="#3-经验教训" class="headerlink" title="3. 经验教训"></a>3. 经验教训</h1><ul>
+<li>一定要经常清理Oracle的归档日志，免得占用太多的磁盘空间。</li>
+<li>如果发现Oracle的归档日志已经占用了太多的空间，一定要在Oracle还能运行的时候去清理，而不是没头脑的先去关Oracle。。。</li>
+<li>是不是可以设置一个定时任务去清理冗余的日志文件？</li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/笔记/" rel="tag">#笔记</a>
+          
+            <a href="/tags/数据库/" rel="tag">#数据库</a>
+          
+            <a href="/tags/Oracle/" rel="tag">#Oracle</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/16/在Cygwin中使用Log4CPlus/" rel="next" title="在Cygwin中使用Log4CPlus">
+                <i class="fa fa-chevron-left"></i> 在Cygwin中使用Log4CPlus
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="LeoBrilliant" />
+          <p class="site-author-name" itemprop="name">LeoBrilliant</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">9</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-问题描述"><span class="nav-number">1.</span> <span class="nav-text">1. 问题描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-详细步骤"><span class="nav-number">2.</span> <span class="nav-text">2. 详细步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-经验教训"><span class="nav-number">3.</span> <span class="nav-text">3. 经验教训</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LeoBrilliant</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
