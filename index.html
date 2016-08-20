@@ -177,6 +177,16 @@
         </li>
       
         
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
         <li class="menu-item menu-item-archives">
           <a href="/archives" rel="section">
             
@@ -304,35 +314,12 @@
 
       
         
-          
-            <h1 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h1><p>今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功能，剩下二三十G空间去哪里了？根据经验，看了下几个可能生成日志比较多的用户，都没有进程在运行，那么这些磁盘应该是被Oracle吃了。到Oracle目录下，执行了清理空间的脚本，就是通过sqlplus执行一些命令，看到屏幕上打出&gt;shutdown immediate; 许久，根据经验，Oracle关闭出现状况。去看Oracle日志，系统在飞速的写一条错误信息，大意是归档日志文件大小达到了限制，写入某条归档日志失败，错误号ORA-19809，后面跟了几个解决方案。因为现在是在关闭的过程中，sqlplus能够登录但是没有办法进行操作，报”shutdown in progress xxx”，输入&gt;shutdown abort;都报”ORA-01031 insufficient privileges”，RMAN也登录不上。几乎绝望。为了不影响开发进度，让同事连其他环境。我决定凭借使用Oracle多年的经验，看能否挽救该环境于危亡之际，不行就重置。借助百度与之前的积累，成功让该环境正常运行，代价是删除了之前的还原点，对开发测试没有实际影响，心中略有成就感。特把拯救过程记录下来。不过需要提醒，在生产环境中慎用。</p>
-<h1 id="2-详细步骤"><a href="#2-详细步骤" class="headerlink" title="2. 详细步骤"></a>2. 详细步骤</h1><ol>
-<li>关闭其他数据库实例</li>
-</ol>
-<p>为了降低复原操作对其他数据库数据的影响，应当先关闭其他数据库，防止数据异常。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$export ORACLE_SID=xxx</div><div class="line">$sqlplus / as sysdba</div><div class="line">&gt;shutdown immediate;</div></pre></td></tr></table></figure></p>
-<ol>
-<li>杀死Oracle进程</li>
-</ol>
-<p>这其实是非常有风险的一步操作，因为当前Oracle有可能写入非常重要的数据，强行杀死进程，导致一些缓存在内存中的数据没有写回到磁盘上，也可能导致日志不完整，一些依赖于日志的操作失效。但是前面也说了，rman登录失败，sqlplus操作也是不成功。我也只能强杀进程了。这也是之前正常关闭其他数据库实例的原因，防止误杀。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$pkill -9 oracle</div><div class="line"># 这种方式有个问题，就是一下把所有的Oracle进程全杀掉，然后用sqlplus启动Oracle时会报ORA-01012 Not logged on. 等了大约几分钟，再次启动就OK了。</div><div class="line"># 晚上搜到另一种方式。</div><div class="line">$ps -ef | grep ora_dbw0_$ORACLE_SID</div><div class="line">$kill -9 pid</div></pre></td></tr></table></figure></p>
-<ol>
-<li>重新启动Oracle</li>
-</ol>
-<p>正常启动Oracle，mount之后就停止，报了一个错误，ORA-38760: 此数据库实例无法启用闪回数据库。这就是前面说的，归档日志格式错误。还是上网搜。先以dba身份登录到Oracle中。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt;alter database flashback off;</div><div class="line">&gt;select name from v$restore_point;</div><div class="line">- 查看还原点的名称，假设为rp_name</div><div class="line">&gt;drop restore point re_name;</div><div class="line">&gt;alter database open;</div><div class="line">- 数据库正常启动</div></pre></td></tr></table></figure></p>
-<ol>
-<li>删除归档日志</li>
-</ol>
-<p>造成此次问题的主要原因是归档日志满了，还是赶紧清理没用的日志。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$export ORACLE_SID=xxx</div><div class="line">$rman target / nocatalog</div><div class="line">&gt;crosscheck archivelog all;</div><div class="line">&gt;delete archivelog all;</div></pre></td></tr></table></figure></p>
-<ol>
-<li>重设还原点</li>
-</ol>
-<p>也没什么难点，就是一些命令。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div></pre></td><td class="code"><pre><div class="line">$export ORACLE_SID=xxx</div><div class="line">$sqlplus / as sysdba</div><div class="line">&gt;shutdown immediate;</div><div class="line">&gt;startup mount;</div><div class="line">- 下面一步如果曾经做过可以省略</div><div class="line">&gt;alter database archivelog;</div><div class="line">- 因为前面关了，所以打开</div><div class="line">&gt;alter database flashback on;</div><div class="line"></div><div class="line">&gt;select flashback_on from v$database;</div><div class="line">- 创建还原点</div><div class="line">&gt;create restore point xxxx guarantee flashback datbase;</div><div class="line">&gt;alter database open;</div></pre></td></tr></table></figure></p>
-<h1 id="3-经验教训"><a href="#3-经验教训" class="headerlink" title="3. 经验教训"></a>3. 经验教训</h1><ul>
-<li>一定要经常清理Oracle的归档日志，免得占用太多的磁盘空间。</li>
-<li>如果发现Oracle的归档日志已经占用了太多的空间，一定要在Oracle还能运行的时候去清理，而不是没头脑的先去关Oracle。。。</li>
-<li>是不是可以设置一个定时任务去清理冗余的日志文件？</li>
-</ul>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>解决Oracle在关闭过程中无法写入归档日志的问题。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/18/Oracle关闭失败Ora-19809/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -449,33 +436,12 @@
 
       
         
-          
-            <h1 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h1><p>之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来有点凌乱，而且想关闭日志输出，就要注释掉对应的代码，重新编译代码，一次两次还勉强可以接受，如果要成百上千次，累积起来的等待时间还是非常漫长。不想自己从头写一个日志模块，决定在系统级的项目或代码中引入开源的日志框架，因为已经有成熟的开源代码，花点时间学习，把更多的时间留给设计和编写业务模块。</p>
-<p>在开源C++日志框架选型的时候，备选的有log4cxx、log4cplus、glog、log4cpp等。glog据说是Google出品，主页正常情况下打不开，源代码也下不到。log4cxx和log4cpp，有个是Apache基金的开源项目之一，但是感觉很久都没有发布新版本。log4cplus还比较活跃，去年研究的时候是1.1.3，现在出到1.2.0，网上说功能比较全面，应该能满足日常使用。log4*系列都是log4j的衍生品。而log4j可以说是Java日志框架的标准，那么对其他语言的派生也不会太差吧。先用起来。</p>
-<p>刚开始学log4cplus的时候，各种困难。设计复杂，支持向屏幕、文件、网络输出日志，还可以在代码中设置或者在配置文件中配置日志的选项或者格式，还有很多开关。看了很多网络上的文章，都很长，讲得也算全面吧，等到具体应用的时候，就开始各种报错。那时候用的VS2012，源代码里提供了VS2010的工程文件，项目升级之后，编译也没啥问题，但是把生成的库链接到其他项目之后，发现log4cplus相关的函数找不到。过程、步骤都没什么问题，来来回回折腾了一整天，一个偶然的机会，发现是要编译成Debug输出格式的dll，然后还是要带什么U的一个dll，我靠。这就是很多人不喜欢技术的原因，为了克服一个问题，要花去大量的时间尝试。问题解决之后在其他人看来又不是什么很有价值的问题。更多的人是在尝试中放弃了，或者根本不愿意去尝试。这也从侧面说明网络上的文章质量不高，这类基础开源项目的文档不完善。所以一直呼吁或者要求，如果要写文档，不光是自己能看懂，而且其他人也能看懂，并且照着文档一步一步做能顺利的实现文档设定的目标。</p>
-<p>对VS的厌恶程度逐步提升。现在已经切到Cygwin。这次准备在Cygwin上编译log4cplus，如果这能成功，那么在Linux上使用也没什么问题。</p>
-<h1 id="2-使用步骤"><a href="#2-使用步骤" class="headerlink" title="2. 使用步骤"></a>2. 使用步骤</h1><ol>
-<li><p>下载源代码并解压<br>从文献[1]处下载源代码，解压到Cygwin的tmp目录下。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ pwd</div><div class="line">/tmp/log4cplus-1.2.0</div></pre></td></tr></table></figure>
-</li>
-<li><p>编译并安装库及头文件</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">$ ./configure; make; make install</div><div class="line"># 库及头文件安装位置</div><div class="line"># /usr/local/include/</div><div class="line"># /usr/local/lib/</div></pre></td></tr></table></figure>
-</li>
-<li><p>项目配置<br>项目中需要加入头文件及库位置的配置，并且需要指明链接时连接log4cplus库。</p>
-</li>
-</ol>
-<h1 id="3-示例代码"><a href="#3-示例代码" class="headerlink" title="3. 示例代码"></a>3. 示例代码</h1><figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div><div class="line">30</div><div class="line">31</div><div class="line">32</div><div class="line">33</div><div class="line">34</div><div class="line">35</div><div class="line">36</div><div class="line">37</div><div class="line">38</div><div class="line">39</div><div class="line">40</div><div class="line">41</div><div class="line">42</div><div class="line">43</div><div class="line">44</div><div class="line">45</div><div class="line">46</div><div class="line">47</div><div class="line">48</div><div class="line">49</div><div class="line">50</div><div class="line">51</div><div class="line">52</div><div class="line">53</div><div class="line">54</div><div class="line">55</div><div class="line">56</div><div class="line">57</div><div class="line">58</div><div class="line">59</div><div class="line">60</div><div class="line">61</div><div class="line">62</div><div class="line">63</div><div class="line">64</div><div class="line">65</div><div class="line">66</div><div class="line">67</div><div class="line">68</div><div class="line">69</div><div class="line">70</div><div class="line">71</div><div class="line">72</div><div class="line">73</div><div class="line">74</div><div class="line">75</div><div class="line">76</div><div class="line">77</div><div class="line">78</div><div class="line">79</div><div class="line">80</div><div class="line">81</div><div class="line">82</div><div class="line">83</div><div class="line">84</div><div class="line">85</div><div class="line">86</div><div class="line">87</div><div class="line">88</div><div class="line">89</div></pre></td><td class="code"><pre><div class="line">#include &lt;log4cplus/logger.h&gt;</div><div class="line">#include &lt;log4cplus/configurator.h&gt;</div><div class="line">#include &lt;iostream&gt;</div><div class="line">#include &lt;log4cplus/consoleappender.h&gt;</div><div class="line">#include &lt;log4cplus/layout.h&gt;</div><div class="line">#include &lt;log4cplus/loggingmacros.h&gt;</div><div class="line">#include &lt;log4cplus/fileappender.h&gt;</div><div class="line">#include &lt;log4cplus/helpers/loglog.h&gt;</div><div class="line"></div><div class="line">#include &lt;tchar.h&gt;</div><div class="line">//#include &lt;log4cplus/helpers/sleep.h&gt;</div><div class="line"></div><div class="line">using namespace log4cplus;</div><div class="line">using namespace log4cplus::helpers;</div><div class="line">using namespace std;</div><div class="line"></div><div class="line">void Log4CPlusTest()</div><div class="line">&#123;</div><div class="line">	cout &lt;&lt; "Log4CPlusTest" &lt;&lt; endl;</div><div class="line">	SharedObjectPtr&lt;Appender&gt; appender(new ConsoleAppender());</div><div class="line"></div><div class="line">	appender-&gt;setName(LOG4CPLUS_TEXT("appender for test"));</div><div class="line"></div><div class="line">	auto_ptr&lt;Layout&gt; layout(new PatternLayout(LOG4CPLUS_TEXT("%d&#123;%m/%d/%y %H:%M:%S&#125; - %m[%l]%n")));</div><div class="line"></div><div class="line">	appender-&gt;setLayout(layout);</div><div class="line"></div><div class="line">	Logger logger = Logger::getInstance(LOG4CPLUS_TEXT("test"));</div><div class="line"></div><div class="line">	logger.addAppender(appender);</div><div class="line">	logger.setLogLevel(ALL_LOG_LEVEL);</div><div class="line"></div><div class="line">	LOG4CPLUS_DEBUG(logger, "This is the first log Message...");</div><div class="line"></div><div class="line">	sleep(1);</div><div class="line"></div><div class="line">	LOG4CPLUS_WARN(logger, "This is the Second log Message...");</div><div class="line"></div><div class="line">	return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void Log4CPlusTestLogFile()</div><div class="line">&#123;</div><div class="line">	tstring file_name = _T("Test.log");</div><div class="line">	SharedAppenderPtr appender(new FileAppender(file_name));</div><div class="line"></div><div class="line">	appender-&gt;setName("logFileTest");</div><div class="line"></div><div class="line">	Logger logger = Logger::getInstance("test.subsetof_filelog");</div><div class="line"></div><div class="line">	logger.addAppender(appender);</div><div class="line"></div><div class="line">	for(int i = 0; i &lt; 5; ++i)</div><div class="line">	&#123;</div><div class="line">		LOG4CPLUS_DEBUG(logger, "Entering loop#" &lt;&lt; i &lt;&lt; "Endline#");</div><div class="line">	&#125;</div><div class="line">	return;</div><div class="line">&#125;</div><div class="line"></div><div class="line"></div><div class="line">void printMsgs()</div><div class="line">&#123;</div><div class="line">	cout &lt;&lt; "Entering printMsgs()..." &lt;&lt; endl;</div><div class="line"></div><div class="line">	LogLog::getLogLog()-&gt;debug("This is a Debug statement");</div><div class="line">	LogLog::getLogLog()-&gt;warn("This is a Waring...");</div><div class="line">	LogLog::getLogLog()-&gt;error("This is a Error...");</div><div class="line"></div><div class="line">	cout &lt;&lt; "Exiting printMsgs()..." &lt;&lt; endl;</div><div class="line"></div><div class="line">	return;</div><div class="line">&#125;</div><div class="line"></div><div class="line">void Log4CPlusTestLogLog()</div><div class="line">&#123;</div><div class="line">	cout &lt;&lt; "Test begins" &lt;&lt; endl;</div><div class="line">	printMsgs();</div><div class="line"></div><div class="line">	cout &lt;&lt; "Turning on debug..." &lt;&lt; endl;</div><div class="line"></div><div class="line">	LogLog::getLogLog()-&gt;setInternalDebugging(true);</div><div class="line">	printMsgs();</div><div class="line"></div><div class="line">	cout &lt;&lt; "Turning on quiet mode..." &lt;&lt; endl;</div><div class="line">	LogLog::getLogLog()-&gt;setQuietMode(true);</div><div class="line">	printMsgs();</div><div class="line"></div><div class="line">	return;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
-<h1 id="3-解决的问题"><a href="#3-解决的问题" class="headerlink" title="3. 解决的问题"></a>3. 解决的问题</h1><ol>
-<li><p>LOG4CPLUS_DEBUG等宏无法解析<br>加入头文件</p>
-<figure class="highlight c++"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;log4cplus/loggingmacros.h&gt;</span></span></div></pre></td></tr></table></figure>
-</li>
-<li><p>计算机中丢失cyglog4cplus-1-2-5.dll<br>这个应该是Cygwin自身的链接机制问题。在CMD中报错，在Eclipse CDT Terminal中无反应，退出码比较奇怪，到了Cygwin命令行中能够正常运行。去当时的编译目录，在.lib目录下还真找到了这个文件。拷贝到项目的Debug目录，再次运行，CMD和Eclipse CDT Terminal都能正常运行。所以想到，把这个文件拷贝到system32或者加入环境变量，都能解决这个问题。</p>
-</li>
-</ol>
-<h1 id="4-参考文献"><a href="#4-参考文献" class="headerlink" title="4. 参考文献"></a>4. 参考文献</h1><p>[1] <a href="https://sourceforge.net/projects/log4cplus/" target="_blank" rel="external">log4cplus</a></p>
-<p>[2] <a href="http://my.oschina.net/lovecxx/blog/185951#OSC_h3_13" target="_blank" rel="external">http://my.oschina.net/lovecxx/blog/185951#OSC_h3_13</a></p>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>在Cygwin中使用Log4CPlus，还有示例代码。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/16/在Cygwin中使用Log4CPlus/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -592,66 +558,12 @@
 
       
         
-          
-            <h1 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h1><p>C或者C++程序可以通过Shell命令实现从源代码到运行程序的编译链接过程。如果每次编译都要把相同的命令手工输一遍，岂不是要浪费大量的时间。后来有人发明的Makefile，把编译的过程和文件的依赖关系维护在其中，在需要编译的时候，只要输入make，程序就能自动判断哪些文件发生了变化，并且按照依赖关系逐个更新（编译），而不是将所有的文件都重新编译一遍。并且Makefile中可以配置其他的target，比如clean、install之类的，通过脚本完成一些重复性的任务。对于小型的项目，一个Makefile足以搞定一切。但是对于中到大型的项目，其中包含多个Makefile，纯手工维护它们对我来说是一个极大的挑战。我更倾向于这样一种方式：手工输入或维护少量的文件，让机器自动执行重复性的工作，一来提高效率，二来降低出错的可能性。就源代码编译这件事情来说，AutoMake和CMake，可以实现上述的目标。之前花了大概一个周末的时间了解AutoMake和CMake的持续构建，在Cygwin和Ubuntu上进行实验，成功的把部分源代码编译成静态库，最后链接到运行中。后来一次脑热，把Ubuntu升级，实验相关的东西都被自动清理掉，没有保存下来。这次决定在Redhat上进行动手实践，复原上次成功的过程，同时尝试在AutoMake中使用动态链接库，提高程序的灵活性。</p>
-<h1 id="2-环境配置"><a href="#2-环境配置" class="headerlink" title="2. 环境配置"></a>2. 环境配置</h1><ul>
-<li>Redhat 6.3</li>
-<li>GCC 4.4</li>
-</ul>
-<p>系统中默认没有安装automake，检查安装源配置，安装需要的软件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$yum install automake</div><div class="line"># 会自动安装autoscan</div><div class="line"></div><div class="line">$yum install libtool</div><div class="line"># 后续会用到</div></pre></td></tr></table></figure></p>
-<p>源代码及目录结构如下：<br><figure class="highlight gherkin"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 文件及目录结构</span></div><div class="line">.</div><div class="line">|<span class="string">-- libHelloWorld</span></div><div class="line">|<span class="string">   </span>|<span class="string">-- HelloWorld.cpp</span></div><div class="line">|<span class="string">   `-- HelloWorld.h</span></div><div class="line">|<span class="string">-- libSo</span></div><div class="line">|<span class="string">   </span>|<span class="string">-- SoTest.cpp</span></div><div class="line">|<span class="string">   `-- SoTest.h</span></div><div class="line">`-- main.cpp</div></pre></td></tr></table></figure></p>
-<p>其中HelloWorld.cpp和SoTest.cpp分别定义了一个简单函数，在main.cpp中由main函数调用。最终生成的可执行文件名称为test。</p>
-<h1 id="3-使用步骤"><a href="#3-使用步骤" class="headerlink" title="3. 使用步骤"></a>3. 使用步骤</h1><ol>
-<li>执行autoscan<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"># 假设当前目录为源代码目录</div><div class="line">$autoscan</div><div class="line"># 生成configure.scan</div><div class="line">$ cp -v configure.scan configure.ac</div><div class="line"># configure.ac是aclocal的输入，需要适当修改文件内容</div><div class="line"># configure.ac完整内容如下</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line"># configure.ac</div><div class="line">#                                               -*- Autoconf -*-</div><div class="line"># Process this file with autoconf to produce a configure script.</div><div class="line"></div><div class="line">AC_PREREQ([2.63])</div><div class="line">AC_INIT([FULL-PACKAGE-NAME], [VERSION], [BUG-REPORT-ADDRESS])</div><div class="line">AC_CONFIG_SRCDIR([main.cpp])</div><div class="line">AC_CONFIG_HEADERS([config.h])</div><div class="line">AM_INIT_AUTOMAKE(test, 1.0)</div><div class="line">AC_CONFIG_MACRO_DIR([m4])</div><div class="line"></div><div class="line"># Checks for programs.</div><div class="line">AC_PROG_RANLIB</div><div class="line">AC_PROG_LIBTOOL</div><div class="line">AC_PROG_CXX</div><div class="line">AC_PROG_CC</div><div class="line"></div><div class="line"># Checks for libraries.</div><div class="line"># AC_PROG_LIBTOOL</div><div class="line"># Checks for header files.</div><div class="line"></div><div class="line"># Checks for typedefs, structures, and compiler characteristics.</div><div class="line"></div><div class="line"># Checks for library functions.</div><div class="line">AC_CONFIG_FILES([Makefile libHelloWorld/Makefile libSo/Makefile])</div><div class="line">AC_OUTPUT</div></pre></td></tr></table></figure>
-<ol>
-<li><p>执行libtoolize</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$libtoolize -f -c</div></pre></td></tr></table></figure>
-</li>
-<li><p>执行aclocal</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$aclocal</div><div class="line">#生成aclocal.m4</div></pre></td></tr></table></figure>
-</li>
-<li><p>执行autoheader</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$autoheader</div><div class="line">#生成config.h.in</div></pre></td></tr></table></figure>
-</li>
-<li><p>执行autoconf</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$autoconf</div><div class="line">#生成configure文件</div></pre></td></tr></table></figure>
-</li>
-<li><p>新建Makefile.am</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># .</span></div><div class="line"><span class="comment"># Makefile.am</span></div><div class="line"><span class="attr">AUTOMAKE_OPTIONS</span>=foreign</div><div class="line"><span class="attr">bin_PROGRAMS</span>=test</div><div class="line"><span class="attr">test_SOURCES</span>=main.cpp</div><div class="line"></div><div class="line"><span class="attr">SUBDIRS</span>=libHelloWorld libSo</div><div class="line"></div><div class="line"><span class="comment"># test_CPPFLAGS = -std=c++11</span></div><div class="line"><span class="attr">test_LDADD</span> = libHelloWorld/libHelloWorld.a -LlibSo -lhello</div><div class="line"></div><div class="line"><span class="attr">INCLUDES</span> =</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"># ./libHelloWorld</div><div class="line"># Makefile.am</div><div class="line">noinst_LIBRARIES=libHelloWorld.a</div><div class="line">noinst_HEADERS=HelloWorld.h</div><div class="line">libHelloWorld_a_SOURCES=HelloWorld.cpp</div></pre></td></tr></table></figure>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"></div><div class="line"># ./libSo</div><div class="line"># Makefile.am</div><div class="line">AUTOMAKE_OPTIONS=foreign</div><div class="line">lib_LTLIBRARIES=libhello.la</div><div class="line">libhello_la_SOURCES=SoTest.cpp</div></pre></td></tr></table></figure>
-<ol>
-<li><p>执行automake</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$automake</div><div class="line">$automake --add-missing</div><div class="line">#生成Makefile.in等</div></pre></td></tr></table></figure>
-</li>
-<li><p>执行configure</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$./configure</div><div class="line"># 检查编译环境，生成Makefile</div></pre></td></tr></table></figure>
-</li>
-<li><p>执行make</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$make</div><div class="line"># 生成target</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="4-问题汇总"><a href="#4-问题汇总" class="headerlink" title="4. 问题汇总"></a>4. 问题汇总</h1><ol>
-<li><p>没有规则可以创建”test”需要的目标” libSo/project”。停止。<br>运行程序的Makefile.am配置错误。正确配置参考前述文件内容。</p>
-</li>
-<li><p>automake: required file `/config.guess’ not found</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$automake --add-missing</div></pre></td></tr></table></figure>
-</li>
-<li><p>automake: Libtool library used but `LIBTOOL’ is undefined…</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div></pre></td><td class="code"><pre><div class="line"># 安装libtool，注意是否安装成功。在测试的过程中，磁盘空间满了，导致无法下载安装包。并没有注意到安装失败，导致相同的错误重复出现。</div><div class="line">$yum install libtool</div><div class="line"></div><div class="line"># 使libtool生效，添加必要的文件</div><div class="line">$libtoolize -f -c</div><div class="line"></div><div class="line"># 在configure.ac中添加以下语句（去掉注释）</div><div class="line"># AC_CONFIG_MACRO_DIR([m4])</div><div class="line"># AC_PROG_LIBTOOL</div><div class="line"></div><div class="line"></div><div class="line"># 重复automake的过程</div><div class="line">$aclocal</div><div class="line">$autoheader</div><div class="line">$autoconf</div><div class="line">$automake --add-missing</div><div class="line">$./configure</div><div class="line">$make</div></pre></td></tr></table></figure>
-</li>
-<li><p>make: `.bss’ can not be used when making a shared object; recompile with -fPIC<br>看了之前的一篇参考文献，说可以在Makefile.am中设置生成动态链接库，结果报了这个错，也没找到有效的解决方案。换了一种在网上比较常见的方案，使用LTLIBRARIES配置，就是使用libtool库自动生成动态链接库。Makefile.am文件内容如下：</p>
-<figure class="highlight ini"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="attr">AUTOMAKE_OPTIONS</span>=foreign</div><div class="line"><span class="attr">lib_LTLIBRARIES</span>=libhello.la</div><div class="line"><span class="attr">libhello_la_SOURCES</span>=SoTest.cpp</div></pre></td></tr></table></figure>
-</li>
-</ol>
-<h1 id="5-参考文献"><a href="#5-参考文献" class="headerlink" title="5. 参考文献"></a>5. 参考文献</h1><p><a href="http://www.cnblogs.com/niocai/archive/2011/07/14/2106089.html" target="_blank" rel="external">http://www.cnblogs.com/niocai/archive/2011/07/14/2106089.html</a><br><a href="http://blog.csdn.net/zhoubl668/article/details/9110795" target="_blank" rel="external">http://blog.csdn.net/zhoubl668/article/details/9110795</a></p>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>在Redhat中使用Automake的完整过程加示例代码。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/16/在Redhat中使用Automake/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -768,78 +680,12 @@
 
       
         
-          
-            <h1 id="1-问题及背景"><a href="#1-问题及背景" class="headerlink" title="1. 问题及背景"></a>1. 问题及背景</h1><p>有次去一家创业公司面试，其本地负责人问道：有25匹马和5根跑道，最少需要举办多少场比赛能选出跑的最快的三匹马。这应该是一道比较常见的面试题。当时为了求快，就给出了最普通的解法，25匹马分成五组比赛，每组淘汰后两名，将晋级的选手再次分组，不够5匹马的小组允许轮空，简单算下来需要12次比赛。面试官一听，“什么？12次？我告诉你，最少需要7次。你先想出一种8次的解法吧。”后来经过一番思考，给出一种接近7次的解法，但是参数选错了。他说，“时间差不多了。今天就先到这里吧，草稿纸你可以带回去，再想想有没有更好的解法。”很显然，挂了。不过思考这道题的过程觉得有点意思，记下来留念。</p>
-<h1 id="2-最普通的解法"><a href="#2-最普通的解法" class="headerlink" title="2. 最普通的解法"></a>2. 最普通的解法</h1><p>有5根跑道，意味着每次最多有5匹马赛跑。按最最一般的赛制，淘汰赛，每5匹马比赛取前三名进入下一轮，淘汰后两名。下一轮按照相同的方式举行淘汰赛，直到取出最快的前三名。具体运算过程如下。</p>
-<p>第一轮，举办5次淘汰赛，剩下15匹马；<br>第二轮，举办3次淘汰赛，剩下9匹马；<br>第三轮，举办2次淘汰赛，剩下6匹马；<br>第四轮，举办1次淘汰赛，剩下4匹马；<br>第五轮，举办1次淘汰赛，剩下3匹马。</p>
-<p>总共需要举行12次比赛。这种算法，小学生都能算出来。</p>
-<h1 id="3-最没有人性的解法"><a href="#3-最没有人性的解法" class="headerlink" title="3. 最没有人性的解法"></a>3. 最没有人性的解法</h1><p>面试官说最少只需要7次的时候，心里有点慌。脑子里冒出一些奇怪的想法。如果是举办循环赛，就是通常所说的车轮战，次数是多还是少呢？试一把。假设马儿体力很好，一天能跑很多次，而且每次跑出的成绩都一样。</p>
-<p>第一场，举办1场比赛，淘汰2匹马，3匹马晋级下一场，剩下20匹马还没比赛；<br>那么剩下每次都要从20匹马中选2匹马出来比赛，比完还需要10场，加上前1场，总共需要11场比赛。</p>
-<p>有进步哦，少了一场。问题是假设不一定成立。如果最后选出来的快马就是第一场比赛晋级的马，那么它们都要多跑十场。不光马会吐血，骑手也会吐血吧。</p>
-<h1 id="4-接近最优的解法"><a href="#4-接近最优的解法" class="headerlink" title="4. 接近最优的解法"></a>4. 接近最优的解法</h1><p>后来想到一个问题，编程算法什么的最重要的是不要做重复的计算。换句话说，就是把之前运算过程中有用的信息给保留下来，下次用的时候直接读就好，而不用再算一遍。如果是循环赛，上面给出的解法已经是最优的，可以就此打住。能优化的部分只剩下淘汰赛这一种。如果要选快马，那么至少每匹马都要跑一轮，所以至少有5场淘汰赛。那么每一场比赛都会留下什么有用的信息呢？当前一轮跑过的马都会有排名，之前跑过的马相对于同一轮参赛的马也有排名。剩下的15匹马里，分别有5个第一、第二、第三名。脑子里想有点乱，稍微画出来。</p>
-<table>
-<thead>
-<tr>
-<th>轮次</th>
-<th>1</th>
-<th>2</th>
-<th>3</th>
-<th>4</th>
-<th>5</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>A</td>
-<td>Y</td>
-<td>Y</td>
-<td>Y</td>
-<td>N</td>
-<td>N</td>
-</tr>
-<tr>
-<td>B</td>
-<td>Y</td>
-<td>Y</td>
-<td>Y</td>
-<td>N</td>
-<td>N</td>
-</tr>
-<tr>
-<td>C</td>
-<td>Y</td>
-<td>Y</td>
-<td>Y</td>
-<td>N</td>
-<td>N</td>
-</tr>
-<tr>
-<td>D</td>
-<td>Y</td>
-<td>Y</td>
-<td>Y</td>
-<td>N</td>
-<td>N</td>
-</tr>
-<tr>
-<td>E</td>
-<td>Y</td>
-<td>Y</td>
-<td>Y</td>
-<td>N</td>
-<td>N</td>
-</tr>
-</tbody>
-</table>
-<p>画出来之后，有种似曾相识的感觉，算法书上有从N个元素中选取第K小的元素？很像啊，照猫画虎。就开始胡诌了。第F轮，让5个第三名跑一把，把后两名淘汰。第G轮，让第F轮跑了前三名的同组的第一及第一名同组的第二和第三一组，取前三即为最快的三匹马。哦，算法的大概过程还依稀记得。“你确定与第F轮第五名同组的第一名不是跑的最快的那匹马吗？”“呃。。。不确定。”“那你为什么要淘汰它？”当时脑袋已经告诉运转了一个多小时，稍微想了下，说第F轮让5个第一名比，按照刚才的流程，第G轮让剩下的再比一次就能选到最快的三匹马。其实当时我也没太想清楚第G轮到底是哪几匹马参赛，就听到面试官说“时间差不多了。今天就。。。”。当时应该被这句话打击到了。怀疑前台的思路是不是有问题。回来的路上一直在想如果F轮让5个第二名跑，会是什么结果。假设F轮之后，赛马的成绩按照ABCDE来排名，前几轮赛马的位置也一起调整，就有A1 &gt; A2 &gt; A3 &gt; A4 &gt; A5， A2 &gt; B2 &gt; C2 &gt; D2 &gt; E2，那么有可能进入最终前三的是A1 ~ E1和 A2，保险起见，需要两轮才能决出最终前三。总共需要8场比赛。在地铁上想来想去，地铁都坐过站，还影响到后来约妹子的心情。</p>
-<h1 id="5-最优解法"><a href="#5-最优解法" class="headerlink" title="5. 最优解法"></a>5. 最优解法</h1><p>晚上回去，问了几个算法大牛。有人回说5次就够了，因为有表。。。好吧，假设我们处在原始社会，没有精确的计时器。百度上也有很多答案，但是感觉都不靠谱，或者说都像我前面的接近最优的解法，没有一个给出很明确的答案说能在7次完成。而我自己也在想，如果F轮让所有第二名的跑，上面给出的解法是最优的。如果F轮让所有第三名跑，不可能比前一种解法的次数少，因为剩下的不确定的元素更多。所以，F轮肯定是让所有第一名的比赛，但是具体怎么跑，当时脑力耗尽，想不出。只推到A1是跑的最快的马，最后一轮要选出第二和第三快的马。临睡前，一个大牛给出了解法，然后我被另一个大牛鄙视了：F轮让所有第一名跑，A1是跑的最快的马；G轮让B1、C1、A2、B2、A3跑，取前两名，可得最快的三匹马。。。</p>
-<h1 id="6-思路总结"><a href="#6-思路总结" class="headerlink" title="6. 思路总结"></a>6. 思路总结</h1><ol>
-<li>利用已经获得信息，减少重复计算；</li>
-<li>尽快缩小选择（排序）的范围，可以使用分治、贪心等方法；</li>
-<li>数据的大小关系（排序）可以用树来表示，更一般的就是图。拿最优解法来说，选出最快的一匹马后，所有与A1距离小于或等于2的节点都有可能是前三名的候选者，幸运的是候选者正好是5个。</li>
-</ol>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>一道面试题的持续改进过程。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/10/25匹马和5根跑道/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -956,31 +802,12 @@
 
       
         
-          
-            <h1 id="1-事件概述"><a href="#1-事件概述" class="headerlink" title="1. 事件概述"></a>1. 事件概述</h1><p>之前的一篇日志中描述了使用Ant进行持续集成所需要的知识点和经验。说完就啪啪打脸。抽了一个周末来改造这个Build.xml，记得改造时做测试什么都是通过的。然后就把试验后模块化更强、更具可读性的脚本合并至原先发布版本的脚本中。到了该发版本的时候，继续执行这个脚本，执行到上传接口文件的步骤发现集成工程终止，屏幕上提示scp报错，错误原因是”No response from server”。原本完整可全自动执行的集成流程因为这个原因而中断，心中甚是不爽。于是就逐步查找错误的原因。修改服务器配置，修改集成脚本尝试，重新安装ant、java，重启机器等等，经过大半天的尝试，终于在快要放弃的时候发现了错误的原因，修正之后，整个版本发布的流程又可以自动运行。这次排障过程又考验了个人的知识面，将过程和经验记录下来，强化已有的知识，同时提醒自己不要再犯类似的错误。</p>
-<h1 id="2-原因分析"><a href="#2-原因分析" class="headerlink" title="2. 原因分析"></a>2. 原因分析</h1><p>脚本原来可以自动运行，中间经过几次可能的变化，然后就不能自动运行，谁都知道问题肯定出现在这几次修改的过程中，挨个查找总能找到原因。那么这里有哪些变化呢？</p>
-<ul>
-<li>修改过脚本，为了提高脚本的模块化水平、可读性，改变了变量的引用关系以及声明的位置，因为之前在单系统上试验过没问题，所以就自以为是的认为在总的脚本里这一块也没有问题；</li>
-<li>前一天开发测试网段的网络出了问题，导致办公电脑连不上开发测试服务器。听说是在更换内网的交换机，有可能是换了交换机之后网络策略或系统配置发生了变化。所以首先按这条线索往下查。</li>
-</ul>
-<h1 id="3-排障过程"><a href="#3-排障过程" class="headerlink" title="3. 排障过程"></a>3. 排障过程</h1><h1 id="3-1-重启本机"><a href="#3-1-重启本机" class="headerlink" title="3.1 重启本机"></a>3.1 重启本机</h1><p>一直对Windows的稳定性很没信心，所以先从自身查起。重启办公电脑，之后重新执行对应脚本，报同样的错误，此路不通。</p>
-<h1 id="3-2-重新安装Ant"><a href="#3-2-重新安装Ant" class="headerlink" title="3.2 重新安装Ant"></a>3.2 重新安装Ant</h1><p>某次执行的过程中，使用ant的Debug模式，最后给出异常信息，大意是发出TCP请求后没有收到回复。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ant -d target</div></pre></td></tr></table></figure></p>
-<p>那么是不是这次安装的ant不稳定，时间长了之后JVM自动GC，导致某些模块无法加载出现异常。好吧，重新来过。</p>
-<ul>
-<li>重新安装JDK</li>
-<li>设置Java环境变量（上次没做，但是正常运行，设置哪些变量可百度之）</li>
-<li>重新安装Ant</li>
-<li>安装对应的插件（将插件复制到ant安装目录下的lib目录下）<br>-<br>做完之后，再次执行，同样的错误，此路也不通。</li>
-</ul>
-<h1 id="3-3-防火墙规则"><a href="#3-3-防火墙规则" class="headerlink" title="3.3 防火墙规则"></a>3.3 防火墙规则</h1><p>之前遇到过Windows默认禁止接收或发出22端口的网络包。为了安全起见，关闭服务器端的防火墙iptables，在办公电脑上设置出站规则。执行上传，Failed Again。</p>
-<p>后来想了想，应该不是防火墙的原因。因为scp和ssh一样用的是22端口，从本机远程登录没有问题的话，那么端口肯定是通的。==所以可以通过远程登录正常来认定SSH服务及其端口正常。==</p>
-<h1 id="3-4-SSH配置"><a href="#3-4-SSH配置" class="headerlink" title="3.4 SSH配置"></a>3.4 SSH配置</h1><p>之前是在另外一台机器上做的部署，现在是一台全新的机器，有可能SSH配置不同。修改/etc/ssh/sshd_config文件，重启SSH服务。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$service ssh restart</div></pre></td></tr></table></figure></p>
-<p>SSH登录正常，但是使用ant进行scp时报同样的错误。</p>
-<h1 id="3-5-Ant脚本SCP语法问题"><a href="#3-5-Ant脚本SCP语法问题" class="headerlink" title="3.5 Ant脚本SCP语法问题"></a>3.5 Ant脚本SCP语法问题</h1><p>SCP是Ant中的一个task，有好几种写法，可以复制单个文件，也可以复制一个文件集合(fileset)。把出问题的SCP改成fileset的方式试试，还是报错啊。这时候已经是晚上八点多，心里有点抓狂。</p>
-<h1 id="3-6-Ant变量引用"><a href="#3-6-Ant变量引用" class="headerlink" title="3.6 Ant变量引用"></a>3.6 Ant变量引用</h1><p>这时候有点破罐破摔的感觉。之前所有的测试都是在集成脚本里新增了一个名称为Debug的Target，尽量保持运行时环境的统一。还可以使用Ant的诊断模式列出运行时使用的变量及其值。我就把出问题的那个Target全部拷贝到Debug下，然后执行，发现一个很奇怪的问题，前几个SCP命令能成功，后面几个会挂掉。然后把挂掉的SCP命令改成执行成功的命令语法格式，还是会挂掉。再仔细一看，执行成功的命令参数，比如file和todir基本上是字面常量写法，失败的都是变量引用。然后把变量引用全部改成常量，执行成功。。。问题原因貌似找到了。变量发生了多级引用，==引用变量时首先要确保变量是存在的或者不为空==，但是在Ant中，如果直接把file或者todir写错，会产生异常信息，但是如果file或者todir中发生了多级引用，并且其中某一级变量出现了问题，Ant无法立即发现错误，而是继续执行。SCP task在执行过程中，没有捕获相应的异常，导致最终给出的错误信息与实际的错误大相径庭。这也算是开源软件的一个问题，测试不够全面严谨。当然发生这种错误的可能性比较小，百度之后发现有几个网页都是提问的，但是没有给出有效的解决方案。如果使用开源软件遇到了小概率事件，那么恭喜你中奖了，要么自己解决，要么回退到前一个版本。</p>
-<h1 id="4-经验积累"><a href="#4-经验积累" class="headerlink" title="4. 经验积累"></a>4. 经验积累</h1><p>对于本次排障，一个最重要的经验就是==不管是写代码还是写脚本一定要写定义变量然后再引用==。有些语言或者脚本解释器会提示变量未定义的异常，那如果像ant这样只能自认倒霉。还有一个经验就是写代码或者做设计时思路要统一。之前在设计这个集成脚本时，思路比较明确，脚本起始定义变量，定义的变量是对某一部分文件、目录或功能的抽象，后续脚本只引用变量，提高脚本的可移植性，减少对脚本后续部分的修改。当中发生过思路的变化，比如变量起初是按照类型来组织，比如前台、后台、接口之类的，后来按照系统来组织，即每个系统相关的配置聚集在一起。这样就导致变量顺序的调整，由此引发一些预期之外的异常。还有一个原因就是自己不够小心。其他语言当中的一些经验形成一些思维定势，没有充分检查依赖条件。经过本次排障，一个有意义的经验当然也是ant的一个问题，==首先要检查命令相关的参数、变量是不是有意义==。Ant目前无法单步调试，可以把变量的值打印到屏幕上，看是否符合预期。</p>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>解决通常说的变量引用为空的问题。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/08/09/Ant脚本排障记/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1097,123 +924,12 @@
 
       
         
-          
-            <p>精益生产（Lean Production），简称“精益”，是衍生自丰田生产方式的一种管理哲学。精益生产理论和生产管理体系仍在不断演化发展当中，涉及库存控制、生产计划管理、流程改进、成本管理、员工素养养成、供应链协同优化、产品生命周期管理（产品概念设计、产品开发、生产线设计、工作台设计、作业方法设计和改进）、质量管理、设备资源和人力资源管理、市场开发及销售管理等企业经营管理设计的诸多层面。</p>
-<p>精益生产是通过系统结构、人员组织、运行方式和市场供求等方面的变革，使生产系统能很快适应用户需求不断变化，并能使生产过程中一切无用、多余的东西被精简，最终达到包括市场供销在内的生产的各方面最好结果的一种生产管理方式。与传统的大生产方式不同，其特色是“多品种”，“小批量”。</p>
-<h1 id="起源"><a href="#起源" class="headerlink" title="起源"></a>起源</h1><p>日本丰田准时化生产JIT（Just in Time），直到20世纪60年代逐步完善而形成的。</p>
-<h1 id="产生"><a href="#产生" class="headerlink" title="产生"></a>产生</h1><p>大规模生产方式以标准化、大批量生产来降低生产成本，提高生产效率。但是无法满足市场需求多样化的发展形势。同时，日本的社会文化背景与美国不同，如家族观念、服从纪律、团队精神、缺少外籍工人、不自由散漫、不强调个人主义等。丰田生产方式反映了日本在重复性劳动生产过程中的管理思想。其指导细想是，通过生产过程整体优化，改进技术，理顺物流，杜绝超量生产，消除无效劳动和浪费，有效利用资源，降低成本，改善质量，达到用最少的投入实现最大产出的目的。</p>
-<h1 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h1><p>基本思想是Just In Time（JIT），“旨在需要的时候，按需要的量，生产所需的产品”。</p>
-<p>核心：</p>
-<ol>
-<li>追求零库存</li>
-<li>追求快速反应，及快速应对市场的变化</li>
-<li>企业内外环境的和谐统一</li>
-<li>人本主义<ul>
-<li>充分尊重员工</li>
-<li>重视培训</li>
-<li>共同协作</li>
-</ul>
-</li>
-</ol>
-<h1 id="效果和优势"><a href="#效果和优势" class="headerlink" title="效果和优势"></a>效果和优势</h1><p>都是些数据，无法证明真假，也没有表明具体应用的行业或领域，暂时忽略。</p>
-<h1 id="终极目标"><a href="#终极目标" class="headerlink" title="终极目标"></a>终极目标</h1><p>“零浪费”，具体表现在PICQMDS七个方面。</p>
-<ol>
-<li>零转产工时浪费（Products：多品种混流生产）</li>
-<li>零库存（Inventory：消减库存）</li>
-<li>零浪费（Cost：全面成本控制）</li>
-<li>零不良（Quality：高品质）</li>
-<li>零故障（Maintenance：提高运转率）</li>
-<li>零停滞（Delivery：快速反应、短交期）</li>
-<li>零灾害（Safety：安全第一）</li>
-</ol>
-<h1 id="原则"><a href="#原则" class="headerlink" title="原则"></a>原则</h1><ul>
-<li>消除八大浪费<ul>
-<li>过量生产</li>
-<li>等待时间</li>
-<li>运输</li>
-<li>库存</li>
-<li>过程（工序）</li>
-<li>动作</li>
-<li>产品缺陷</li>
-<li>忽视员工创造力</li>
-</ul>
-</li>
-<li>关注流程，提高总体效益</li>
-<li>建立无间断流程以快速应变</li>
-<li>降低库存</li>
-<li>全过程的高质量，一次做对</li>
-<li>基于顾客需求的拉动生产</li>
-<li>标准化与工作创新</li>
-<li>尊重员工，给员工授权</li>
-<li>团队工作</li>
-<li>满足顾客需要</li>
-<li>精益供应链</li>
-<li>“自我反省”和“现地现物”</li>
-</ul>
-<h1 id="改善原则"><a href="#改善原则" class="headerlink" title="改善原则"></a>改善原则</h1><ul>
-<li>取消（Eliminate）</li>
-<li>合并（Combine）</li>
-<li>重拍（Rearrange）</li>
-<li>简化（Simplify）</li>
-</ul>
-<h1 id="实质"><a href="#实质" class="headerlink" title="实质"></a>实质</h1><ul>
-<li>一种生产方式<ul>
-<li>最大限度的减少企业生产所占用的资源和降低企业管理和运营成本为主要目标</li>
-</ul>
-</li>
-<li>一种理念</li>
-<li>一种文化</li>
-</ul>
-<h1 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h1><p>与传统生产方式的区别主要表现为：</p>
-<ul>
-<li>改变了品质控制手段</li>
-<li>消灭（减少）了各种缓冲区</li>
-<li>增加了职工的参与感和责任感</li>
-<li>培训职工并与职工交流</li>
-<li>仅在需要的地方采用自动化</li>
-<li>精益组织结构</li>
-</ul>
-<h1 id="常见问题"><a href="#常见问题" class="headerlink" title="常见问题"></a>常见问题</h1><ul>
-<li>管理人员同作业人员的观念没有改变</li>
-<li>急功近利</li>
-<li>没找到好的切入点</li>
-<li>样板区先行</li>
-<li>现场“5S”没做好<ul>
-<li>5S是整理、整顿、清扫、清洁、素养的缩写</li>
-</ul>
-</li>
-<li>实施过程遇到困难就停滞不前</li>
-<li>投入资金太多</li>
-<li>缺乏整体配合</li>
-</ul>
-<h1 id="实施步骤"><a href="#实施步骤" class="headerlink" title="实施步骤"></a>实施步骤</h1><ul>
-<li>选择要改进的关键流程</li>
-<li>画出价值流程图</li>
-<li>开展持续改进研讨会</li>
-<li>营造企业文化</li>
-<li>推广到整个企业</li>
-</ul>
-<h1 id="管理原则"><a href="#管理原则" class="headerlink" title="管理原则"></a>管理原则</h1><ol>
-<li>管理决策必须以长期理念为基础，即使必须因此牺牲短期财务目标也在所不惜</li>
-<li>建立无间断的作业流程以使问题浮现</li>
-<li>使用“后拉式制度”以避免生产过剩</li>
-<li>使工作负荷平均（平准化）</li>
-<li>建立立即暂停以解决问题、一开始就重视品管的文化</li>
-<li>职务工作的标准化是持续改善与授权员工的基础</li>
-<li>使用视觉管控，使问题无从隐藏</li>
-<li>使用可靠的、已经经过充分测试的技术以支持人员及流程</li>
-<li>栽培彻底了解并拥抱公司理念的员工成为领导者，并使他们能教导其他员工</li>
-<li>栽培与发展信奉公司理念的杰出人才与团队</li>
-<li>重视公司的事业伙伴与供货商网络，挑战他们，并帮助他们改善</li>
-<li>亲临现场查看以彻底了解情况（现地现物）</li>
-<li>决策不急躁，以共识为基础，彻底考虑所有可能选择，快速执行决策</li>
-<li>透过不断的省思与持续改善，以变成一个学习型组织</li>
-</ol>
-<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
-<li><a href="http://baike.baidu.com/link?url=c7PwHIb4FmVOxV5weKB_JiAkYxisZrhbACuIEw7BefDUumKqABcuUMIagRgE3_DaxpvKN0LabWpsWb2f08-ecZnIGrO-dIV47Xtuk9Mo6845afUDo-Rncrj7MU5QY9XOnxGmgC8Grx4rqaNaSRkywK" target="_blank" rel="external">http://baike.baidu.com/link?url=c7PwHIb4FmVOxV5weKB_JiAkYxisZrhbACuIEw7BefDUumKqABcuUMIagRgE3_DaxpvKN0LabWpsWb2f08-ecZnIGrO-dIV47Xtuk9Mo6845afUDo-Rncrj7MU5QY9XOnxGmgC8Grx4rqaNaSRkywK</a>, 百度百科</li>
-</ul>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>精益生产的学习笔记，原文在百度百科中。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/31/精益生产学习笔记/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1330,60 +1046,12 @@
 
       
         
-          
-            <h1 id="1-安装配置"><a href="#1-安装配置" class="headerlink" title="1. 安装配置"></a>1. 安装配置</h1><ul>
-<li>安装JDK。目前的JDK安装文件好像不用再设置classpath之类的东西。</li>
-<li>下载并安装ant，并ant运行程序地址加入环境变量%Path%。</li>
-<li>下载并安装插件，如SVN等。</li>
-<li>在命令行中运行如下命令<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"># 定义username属性，执行target1和target2，默认读取当前目录build.xml中配置</div><div class="line">$ant -Dusername=me target1 target2</div></pre></td></tr></table></figure>
-</li>
-</ul>
-<h1 id="2-中文不适合Properties"><a href="#2-中文不适合Properties" class="headerlink" title="2. 中文不适合Properties"></a>2. 中文不适合Properties</h1><p>今天极不情愿的来到公司，想着现在的build.xml有点乱，尝试使用properties文件，结果失败。properties文件默认编码不是UTF-8，直接被ant引用的话无法识别其中包含中文字符的属性（property），因此需要需要手工转码，步骤如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">$native2ascii -encoding UTF-8 A.properties B.properties</div><div class="line"># 上述命令的作用是A.properties转换成UTF-8编码，保存成B.properties文件。</div><div class="line"># native2ascii.exe 在JDK的bin目录下。并且A和B不能相同，否则转码不成功。</div></pre></td></tr></table></figure></p>
-<p>转码虽然成功了，接下来出现了恶心的问题，中文字符全被转成了Unicode编码，一点可读性都没有。而且如果是转义字符，还需要手工在他前面补充反斜杠（backslash, \）。虽然在ant执行的时候没什么问题，不过这东西最后还是要给人看，相比之下在build.xml中直接定义property更有可读性。就是build.xml最后长了一点。</p>
-<p>顺手记一笔如何把ant需要的property定义在专门的properties文件中。</p>
-<blockquote>
-<p>build.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- Comments --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"PropertyA"</span> <span class="attr">value</span>=<span class="string">"ValueA"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">file</span>=<span class="string">"B.properties"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">echo</span> <span class="attr">message</span>=<span class="string">"$&#123;PropertyC&#125;"</span> /&gt;</span></div></pre></td></tr></table></figure></p>
-<p>B.properties<br><figure class="highlight ini"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># Comment goes here</span></div><div class="line"><span class="attr">PropertyB</span>=ValueB</div><div class="line"><span class="attr">PropertyC</span>=<span class="variable">$&#123;PropertyB&#125;</span>\\Something\\<span class="variable">$&#123;PropertyA&#125;</span></div></pre></td></tr></table></figure></p>
-</blockquote>
-<p>后来想到build.xml里面定义的属性很多，难免有公共部分。如果我能在value部分引用其他的property，那么我能不能通过在name部分引用其他的property来增强脚本的灵活性？就开始大胆的尝试。</p>
-<blockquote>
-<p>build.xml<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 最后输出是"$&#123;$&#123;PropertyA&#125;.sth&#125;"，而不是"ValueA.sth" --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"PropertyA"</span> <span class="attr">value</span>=<span class="string">"ValueA"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"$&#123;PropertyA&#125;.sth"</span> <span class="attr">value</span>=<span class="string">"$&#123;PropertyA&#125;.sth"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">echo</span> <span class="attr">message</span>=<span class="string">"$&#123;$&#123;PropertyA&#125;.sth&#125;"</span> /&gt;</span></div></pre></td></tr></table></figure></p>
-</blockquote>
-<p>其实这也是正常的，因为Java也是一种编译型的语言，很多东西在编译时就确定了，比如变量名，property的name属性可以理解为一个变量名，value属性是变量值，是在运行时确定的（如果不是常量）。所以这里的关系就有点复杂，编译的时候没法确定一个不确定的东西，然后就简单处理成一个字符串。</p>
-<h1 id="3-Ant使用指南"><a href="#3-Ant使用指南" class="headerlink" title="3. Ant使用指南"></a>3. Ant使用指南</h1><h2 id="3-1-项目基本设置"><a href="#3-1-项目基本设置" class="headerlink" title="3.1 项目基本设置"></a>3.1 项目基本设置</h2><blockquote>
-<p>设置项目名称，默认执行目标，项目的根目录及时间戳格式</p>
-</blockquote>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">project</span> <span class="attr">name</span>=<span class="string">"HelloWorld"</span> <span class="attr">default</span>=<span class="string">"AutoBuild"</span> <span class="attr">basedir</span>=<span class="string">"./"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">tstamp</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">format</span> <span class="attr">property</span>=<span class="string">"DSTAMP"</span> <span class="attr">pattern</span>=<span class="string">"yyyyMMddHH"</span> <span class="attr">locale</span>=<span class="string">"en"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">tstamp</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">project</span>&gt;</span></div></pre></td></tr></table></figure>
-<h2 id="3-2-SVN基本配置"><a href="#3-2-SVN基本配置" class="headerlink" title="3.2 SVN基本配置"></a>3.2 SVN基本配置</h2><blockquote>
-<p>设置ant目录、SVN任务使用类库及配置。</p>
-</blockquote>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">property</span> <span class="attr">name</span>=<span class="string">"ant.dir"</span> <span class="attr">value</span>=<span class="string">"D:\Program Files\ant"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">path</span> <span class="attr">id</span>=<span class="string">"project.classpath"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">pathelement</span> <span class="attr">location</span>=<span class="string">"$&#123;ant.dir&#125;/lib/svnjavahl.jar"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">pathelement</span> <span class="attr">location</span>=<span class="string">"$&#123;ant.dir&#125;/lib/svnClientAdapter.jar"</span> /&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">pathelement</span> <span class="attr">location</span>=<span class="string">"$&#123;ant.dir&#125;/lib/svnant.jar"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">path</span>&gt;</span></div><div class="line"></div><div class="line"><span class="tag">&lt;<span class="name">taskdef</span> <span class="attr">resource</span>=<span class="string">"org/tigris/subversion/svnant/svnantlib.xml"</span> <span class="attr">classpathref</span>=<span class="string">"project.classpath"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">taskdef</span> <span class="attr">name</span>=<span class="string">"svn"</span> <span class="attr">classname</span>=<span class="string">"org.tigris.subversion.svnant.SvnTask"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">classpath</span> <span class="attr">refid</span>=<span class="string">"project.classpath"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">taskdef</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">svnSetting</span> <span class="attr">id</span>=<span class="string">"svn.setting"</span> <span class="attr">svnkit</span>=<span class="string">"true"</span> <span class="attr">username</span>=<span class="string">"user"</span> <span class="attr">password</span>=<span class="string">"password"</span> <span class="attr">javahl</span>=<span class="string">"false"</span> /&gt;</span></div></pre></td></tr></table></figure>
-<h2 id="3-3-设置构建目标"><a href="#3-3-设置构建目标" class="headerlink" title="3.3 设置构建目标"></a>3.3 设置构建目标</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 如果依赖不是很紧密，就别设置depends --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">target</span> <span class="attr">name</span>=<span class="string">"SomeTarget"</span> <span class="attr">depends</span>=<span class="string">"OtherTarget"</span> &gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">echo</span> <span class="attr">message</span>=<span class="string">"Begin of SomeTarget"</span> /&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">target</span>&gt;</span></div></pre></td></tr></table></figure>
-<h2 id="3-4-文件-目录操作"><a href="#3-4-文件-目录操作" class="headerlink" title="3.4 文件/目录操作"></a>3.4 文件/目录操作</h2><blockquote>
-<p>创建目录</p>
-</blockquote>
-<figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">mkdir</span> <span class="attr">dir</span>=<span class="string">"HelloWorld"</span>/&gt;</span></div></pre></td></tr></table></figure>
-<blockquote>
-<p>删除目录<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 删除目录，可同时设置包含或排除的类型 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">delete</span> <span class="attr">verbose</span>=<span class="string">"false"</span> <span class="attr">includeemptyDirs</span>=<span class="string">"true"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">"."</span> <span class="attr">defaultexcludes</span>=<span class="string">"false"</span> <span class="attr">includes</span>=<span class="string">"**/*.svn/"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">"HelloWorld"</span> <span class="attr">includes</span>=<span class="string">"**/*"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">delete</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>拷贝文件或目录<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 从OtherDir拷贝到HelloWorld，拷贝时排除一些文件或目录 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">copy</span> <span class="attr">todir</span>=<span class="string">"HelloWorld"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">"OtherDir"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">exclude</span> <span class="attr">name</span>=<span class="string">"*.svn"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">exclude</span> <span class="attr">name</span>=<span class="string">"**/*.log"</span>/&gt;</span></div><div class="line">  <span class="tag">&lt;/<span class="name">fileset</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">copy</span>&gt;</span></div></pre></td></tr></table></figure></p>
-<p>替换文件内容<br><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">--!</span> 将<span class="attr">Config.xml</span>中的"<span class="attr">HelloWorldTest</span>"替换成"<span class="attr">HelloWorld</span>"，<span class="attr">match</span>支持正则表达式 <span class="attr">--</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">replaceregexp</span> <span class="attr">byline</span>=<span class="string">"true"</span> <span class="attr">file</span>=<span class="string">"HelloWorld\Config.xml"</span> <span class="attr">match</span>=<span class="string">"HelloWorldTest"</span> <span class="attr">replace</span>=<span class="string">"HelloWorld"</span> <span class="attr">flags</span>=<span class="string">""</span>/&gt;</span></div></pre></td></tr></table></figure></p>
-</blockquote>
-<h2 id="3-5-条件变量的设置与使用"><a href="#3-5-条件变量的设置与使用" class="headerlink" title="3.5 条件变量的设置与使用"></a>3.5 条件变量的设置与使用</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- 判断本地文件目录是否存在 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">condition</span> <span class="attr">property</span>=<span class="string">"project_exist"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">and</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">available</span> <span class="attr">file</span>=<span class="string">"HelloWorld"</span> <span class="attr">type</span>=<span class="string">"dir"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">and</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">condition</span>&gt;</span></div><div class="line"><span class="comment">&lt;!-- 如果存在则删除目录，显示消息 --&gt;</span></div><div class="line"><span class="comment">&lt;!-- 如果要判断不存在，将"if"换成"unless" --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">target</span> <span class="attr">name</span>=<span class="string">"deleteFiles"</span> <span class="attr">if</span>=<span class="string">"project_exist"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">echo</span> <span class="attr">message</span>=<span class="string">"delete files"</span> /&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">delete</span> <span class="attr">verbose</span>=<span class="string">"false"</span> <span class="attr">includeemptyDirs</span>=<span class="string">"true"</span>&gt;</span></div><div class="line">        <span class="tag">&lt;<span class="name">fileset</span> <span class="attr">dir</span>=<span class="string">"."</span> <span class="attr">defaultexcludes</span>=<span class="string">"false"</span> <span class="attr">includes</span>=<span class="string">"**/*.svn/"</span>/&gt;</span></div><div class="line">    <span class="tag">&lt;/<span class="name">delete</span>&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">target</span>&gt;</span></div></pre></td></tr></table></figure>
-<h2 id="3-6-SVN的使用"><a href="#3-6-SVN的使用" class="headerlink" title="3.6 SVN的使用"></a>3.6 SVN的使用</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div></pre></td><td class="code"><pre><div class="line"><span class="tag">&lt;<span class="name">--!</span> <span class="attr">Checkout</span>，其他命令也差不多 <span class="attr">--</span>&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">svn</span> <span class="attr">refid</span>=<span class="string">"svn.setting"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">checkout</span> <span class="attr">url</span>=<span class="string">"SVN地址"</span> <span class="attr">revision</span>=<span class="string">"HEAD"</span> <span class="attr">destPath</span>=<span class="string">"HelloWorld"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">svn</span>&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- Import --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">svn</span> <span class="attr">refid</span>=<span class="string">"svn.setting"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">import</span> <span class="attr">path</span>=<span class="string">"文件或目录地址"</span> <span class="attr">url</span>=<span class="string">"SVN地址"</span> <span class="attr">message</span>=<span class="string">"SVN日志"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">svn</span>&gt;</span></div></pre></td></tr></table></figure>
-<h2 id="3-7-SSH和SCP"><a href="#3-7-SSH和SCP" class="headerlink" title="3.7 SSH和SCP"></a>3.7 SSH和SCP</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- trust不用每次都确认 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">scp</span> <span class="attr">file</span>=<span class="string">"文件名"</span> <span class="attr">todir</span>=<span class="string">"username:password@IPAddress:Directory"</span> <span class="attr">trust</span>=<span class="string">"true"</span>/&gt;</span></div><div class="line"></div><div class="line"><span class="comment">&lt;!-- source的作用是激活环境变量 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">sshexec</span> <span class="attr">host</span>=<span class="string">"IP地址"</span> <span class="attr">username</span>=<span class="string">"用户名"</span> <span class="attr">password</span>=<span class="string">"密码"</span> <span class="attr">trust</span>=<span class="string">"true"</span> <span class="attr">command</span>=<span class="string">"cd /home/username;source .bash_profile;./SomeFile.sh"</span>/&gt;</span></div></pre></td></tr></table></figure>
-<h2 id="3-8-CMD命令"><a href="#3-8-CMD命令" class="headerlink" title="3.8 CMD命令"></a>3.8 CMD命令</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="comment">&lt;!-- cmd切换至HelloWorld目录，执行Hello.bat --&gt;</span></div><div class="line"><span class="comment">&lt;!-- 执行过程中的输入保存在input.txt中，每行一次输入 --&gt;</span></div><div class="line"><span class="tag">&lt;<span class="name">exec</span> <span class="attr">dir</span>=<span class="string">"HelloWorld"</span> <span class="attr">executable</span>=<span class="string">"cmd"</span> <span class="attr">input</span>=<span class="string">"input.txt"</span>&gt;</span></div><div class="line">    <span class="tag">&lt;<span class="name">arg</span> <span class="attr">value</span>=<span class="string">"/c Hello.bat"</span>/&gt;</span></div><div class="line"><span class="tag">&lt;/<span class="name">exec</span>&gt;</span></div></pre></td></tr></table></figure>
-<h1 id="4-Ant经验"><a href="#4-Ant经验" class="headerlink" title="4. Ant经验"></a>4. Ant经验</h1><ul>
-<li>property定义在文件的起始，类似于C语言函数变量定义在函数的开始处。这样的好处是集成构建流程相对固定，其脚本需要变化的部分比较集中，有效防止误操作。</li>
-<li>property命名规范，名称可以类似于Java变量的命名，并且支持”.”分隔，有点类似于对象的继承关系，所以property的命名方式可以按照对象由大到小的顺序排列，这样容易理解，比如Project.SubProject.Package.Class。</li>
-<li>如果property的名称以”.”分隔，最后一个”.”之后指明property对象的类型，比如dir, file之类。</li>
-<li>目前一个完整的系统配置项为系统目录、前台源码目录、前台运行程序目录、接口文件目录、后台接口文件目录、前台解决方案文件、前台系统配置文件、后台接口文件。</li>
-</ul>
-<h1 id="5-重要网站"><a href="#5-重要网站" class="headerlink" title="5. 重要网站"></a>5. 重要网站</h1><ul>
-<li><a href="http://ant.apache.org/manual/index.html" target="_blank" rel="external">http://ant.apache.org/manual/index.html</a>, 参考手册</li>
-<li><a href="http://subclipse.tigris.org/svnant.html" target="_blank" rel="external">http://subclipse.tigris.org/svnant.html</a>, SVNANT网站</li>
-</ul>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>Ant安装配置及基本用法。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/30/Ant实战/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1500,72 +1168,12 @@
 
       
         
-          
-            <p><em>伟人坚持自我管理以成就非凡，天资平平之人必须学习如何管理自己、如何发展自己，还必须在能够做出最大贡献的地方工作</em>，才能实现超越自我。</p>
-<p><em>职业生涯长达50年，我们还必须保持头脑清醒和专注，这意味着我们要知道如何换工作以及何时该换。</em>这好像是这篇文章关注的重点啊。</p>
-<h1 id="1-我的优势是什么？What-Are-My-Strengths"><a href="#1-我的优势是什么？What-Are-My-Strengths" class="headerlink" title="1. 我的优势是什么？What Are My Strengths?"></a>1. 我的优势是什么？What Are My Strengths?</h1><p><em>多数人以为知道自己擅长做什么，但他们往往错了。更常见的情况是，人们知道自己不擅长做什么–即便在这件事上，错误的人也比正确的人要多。而一个人想要有所作为，只能靠发挥优势。我们不可能在自己不擅长的事情上取得成就，更不用说那些自己根本无能为力的事情了。</em></p>
-<p>回馈分析法。当你做重要决定或采取重要行动时，写下你期望发生的事情。9或12个月以后，将实际结果与你的期望做对比。Build on your Strengths.</p>
-<p>做完回馈分析之后，你需要在几个方面采取行动：</p>
-<ul>
-<li>专注于你的优势。要在能够让你发挥优势、创造成果的地方工作。</li>
-<li>不断强化你的优势。回馈分析法会迅速解释，哪些方面你需要提高技能或学习新技能。</li>
-<li>看看在哪些方面，你因恃才傲物而造成了无能和无知，你得想办法去克服。</li>
-<li>纠正坏习惯。所谓坏习惯，是指那些因为你做了（或没做）而影响工作成效和业绩的事情。这些坏习惯很快就会在回馈分析中显现。</li>
-</ul>
-<p>回馈分析还会帮助发现问题产生的原因，比如缺乏礼貌。（如何表现出礼貌？我想问）反映出哪些事情你不应该做。<br>其实，我们应该把精力、资源和时间都用于将足以胜任的人打造成明星版的行家里手。而不在许多毫无天赋或一窍不通的领域，甚至连平庸的水平都达不到，尽量少浪费时间。</p>
-<h1 id="2-我是如何做事的？How-Do-I-Perform"><a href="#2-我是如何做事的？How-Do-I-Perform" class="headerlink" title="2. 我是如何做事的？How Do I Perform?"></a>2. 我是如何做事的？How Do I Perform?</h1><p>和优势一样，一个人的做事方式也是独特的。这是由性格决定的。</p>
-<ul>
-<li>我是阅读型还是倾听型？感觉像是事先准备和随机应变。</li>
-<li>我是如何学习的？How Do I Learn?通过写作来学习，通过做笔记，通过说话。。。</li>
-<li>我可以与他人很好的共事吗？还是我比较喜欢独来独往？如果你和他人共事不错，那你就得问问：在何种关系中相处得不错呢？</li>
-<li>我以什么角色创造成果？是作为决策者还是作为顾问？其实就是寻找自己的定位。</li>
-<li>我能否在压力下做好工作？还是说，我需要一个高度规范化、可预期的工作环境？我在大机构还是小机构里表现最佳？</li>
-</ul>
-<p>“Do not try to change yourself–you are unlikely to succeed. Work to improve the way you perform.”</p>
-<h1 id="3-我的价值观是什么？What-Are-My-Values"><a href="#3-我的价值观是什么？What-Are-My-Values" class="headerlink" title="3. 我的价值观是什么？What Are My Values?"></a>3. 我的价值观是什么？What Are My Values?</h1><p>道德标准对所有人应该都是一样的，而且道德的测试方法很简单，我把它称作“镜子测试”。我每天早晨照镜子时，想看到一个什么样的人？<br>但是道德观只是价值体系的一部分，对于组织的价值体系而言尤其如此。<br>如果组织的价值体系不为自己接受，或者跟自己的价值体系有冲突，你在组织里就会倍感挫折，难有作为。同样，价值观也会影响公司的战略。<br>一个人要想在组织中有所作为，其价值观就必须与组织的价值观相容。两者的价值观不需要完全吻合，但必须接近到可以共存的程度。价值观才是最终的试金石。</p>
-<h1 id="4-我归属何方？Where-Do-I-Belong"><a href="#4-我归属何方？Where-Do-I-Belong" class="headerlink" title="4. 我归属何方？Where Do I Belong?"></a>4. 我归属何方？Where Do I Belong?</h1><p>大多数人，尤其是天资好的人，并不完全清除自己将何去何从，一般都是直到25岁以后才有头绪。不过，此时他们应该弄清楚以下三个问题的答案：我的优势是什么？我的做事方式是怎样的？我的价值观是什么？然后他们就能够决定自己的事业归属，并且也应该做出这一决定。<br>更确切的说，他们应该能够确定自己不属于何处。</p>
-<p>成功的事业不是计划出来的。当人们了解了自己的优势、工作方式和价值观并准备好拥抱机会时，事业就会自然而然的发展。知道自己归属于何处，能够使一个勤奋、有能力但原本表现平平的普通人编程出类拔萃的工作能手。</p>
-<h1 id="5-我能贡献什么？What-Should-I-Contribute"><a href="#5-我能贡献什么？What-Should-I-Contribute" class="headerlink" title="5. 我能贡献什么？What Should I Contribute?"></a>5. 我能贡献什么？What Should I Contribute?</h1><p>我想做的事情是什么？“自行其是”其实是一个错误的答案。</p>
-<p>我能贡献什么？要回答这个问题，必须先考虑三个不同因素：</p>
-<ol>
-<li>在当前的情况下，需要完成什么？</li>
-<li>考虑到我的优势、工作方式和价值观，我怎样才能对需要完成的事情做出最大贡献？</li>
-<li>必须出现什么样的结果，才能改变现状？</li>
-</ol>
-<p>通常，一份计划的时间跨度如果超过了18个月，就很难做到清晰和具体。因此，在大多数情况下，我们应当问问自己：“未来18个月里，我在何处能够获得可以改变现状的结果？用什么方式可以实现？”问题的答案必须平衡几个因素：</p>
-<ul>
-<li>首先，结果必须是难以实现的——你需要一个“张力”（stretching）目标；但同时，它也应当是力所能及的。</li>
-<li>其次，结果必须有意义，应当能够带来改变。</li>
-<li>最后，结果应当是明显的；如果可能的话，还应当可衡量。</li>
-</ul>
-<p>接下来，你就可以制定一系列的行动方案：做什么、从何处着手、怎样开始、目标是什么，以及在多长时间内完成。</p>
-<h1 id="6-对人际关系承担责任。Resposibility-for-Relationships"><a href="#6-对人际关系承担责任。Resposibility-for-Relationships" class="headerlink" title="6. 对人际关系承担责任。Resposibility for Relationships."></a>6. 对人际关系承担责任。Resposibility for Relationships.</h1><ul>
-<li>首先，要接受别人和你一样都是独立个体这个事实。要想工作富有成效，你就必须了解共事伙伴的优势、工作方式和价值观。</li>
-<li>对沟通负责。尝试去了解同事的优势、工作方式和价值观。</li>
-</ul>
-<p>如今的组织不再建立在权力之上，而是建立在信任之上。人与人之间存在互信，不一定意味着相关喜爱，而是意味着人们彼此理解。因此，对人际关系负责是必不可少的。这是一种义务。一个人无论是组织的成员，还是组织的顾问、供应商或分销商，都要对与所有工作伙伴的关系负责——所谓工作伙伴就是你在工作中需要依赖的那些人，同时也是工作中需要依赖你的那些人。</p>
-<h1 id="7-你的下半生。The-Second-Half-of-Your-Life"><a href="#7-你的下半生。The-Second-Half-of-Your-Life" class="headerlink" title="7. 你的下半生。The Second Half of Your Life."></a>7. 你的下半生。The Second Half of Your Life.</h1><p>当工作对多数人而言意味着体力劳动时，人们无需担心他们的下半生。</p>
-<p>发展第二事业。</p>
-<ol>
-<li>换一份新工作；</li>
-<li>发展一份平行事业；</li>
-<li>成为社会企业家。</li>
-</ol>
-<p>要管理好你的下半生，有一个先决条件：你必须在进入下半生之前，早早做好准备。</p>
-<h1 id="8-总结"><a href="#8-总结" class="headerlink" title="8. 总结"></a>8. 总结</h1><p>要创造卓越的人生，你先得问问自己下面5个问题：</p>
-<ol>
-<li>我的优势是什么？</li>
-<li>我是怎样工作的？</li>
-<li>我的价值观是什么？</li>
-<li>我归属何方？</li>
-<li>我能贡献什么？</li>
-</ol>
-<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
-<li><a href="http://www.hbrchina.org/2015-11-26/3613.html" target="_blank" rel="external">http://www.hbrchina.org/2015-11-26/3613.html</a>, 这个是《哈佛商业评论》刊载文章的原版，中文翻译略作删减，整体结构还是比较完整的。</li>
-<li><a href="http://www.mbachina.com/html/zhaopin/201606/93609.html" target="_blank" rel="external">http://www.mbachina.com/html/zhaopin/201606/93609.html</a>, 这个是MBAChina网站上刊载的文章，优点是有少量的英文和插图，内容比官方网站的版本少了一些，但是不影响整体阅读效果。</li>
-</ul>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>彼得·德鲁克的经典自我管理文章。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/24/你的职场上限究竟在哪里/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1682,20 +1290,12 @@
 
       
         
-          
-            <p>凌晨两点多，应该是被只蚊子咬了一口，也有可能是昨天晚上临睡前喝了太多可乐，咖啡因开始生效，在床上躺了几十分钟都没有睡着，决定起来嗨。看了本季最后一集《我想和你唱》，回顾了《真正男子汉》里杜海涛花了将近一小时徒手攀爬绳索渡江那一段，终于想起要写为个人博客准备第一篇文章。</p>
-<p>我已经记不清跟多少个人说过要写博客了。要写博客这句话不是吹牛，说给其他人听其实是想给自己一点压力，促使自己完成某件事。因为如果有人问起这件事，我还不太想让自己处在一种尴尬的境地。因为同时进行的还有其他的事，而且还有很多计划以外的事情发生，我又没有三头六臂，导致完成日期一拖再拖。不喜欢这种延迟的状态，TODO List很长，我又是那种习惯于专心完成一件事之后再做下一件的个性，所以昨天下午公司培训结束之后，回到公寓就开始准备搭建博客的环境。</p>
-<p>印象中最火的开源博客软件是Wordpress，刚毕业那会儿就在自己的电脑上弄出了一个HelloWorld，而且可以从互联网访问。间断了很长时间。后来写博客的想法再次冒出来，首先想到的还是Wordpress，而且也能运行在局域网里，4月份之前写了十来篇文章，都是技术性的，还有一些日志。所以我在跟其他人说我要写博客的时候，我已经在写了，只是没有发布到互联网上。有次脑子抽疯，没有备份数据就升级系统和数据库，升级完之后，很多东西不能继续使用，好在升级过程中提示我把原先的数据文件保存到其他位置，还给我一点能恢复的希望，抽空把数据导出来，这可是我好几个月的心血。</p>
-<p>目前官方发布的Wordpress用的是php，插件丰富，功能也是非常的多样化。新的需求基本上都可以用现有的插件来实现。但是，天下没有免费的午餐。很多插件都要求一些额外的步骤，比如注册验证啦、升级到收费版之类的。另外一个不可避免的问题是插件增多肯定会导致性能下降。再加上对php无感，或者说不想为一些小功能新学一门编程语言，就开始寻找一些其他的博客软件。</p>
-<p>这时候，Node.js进入了我的视野。差不多用Wordpress写HelloWorld的时候初步了解过一些。这是个Javascript的运行时环境，那时候还是一个新兴的技术，主要特点是异步编程。现在再去看，好家伙，打个不恰当的比方，Angelababy，风头正劲。它的诱人之处在于统一了前后台的编程语言。前端网页是HTML + Javascript + CSS，后端服务器用php或者Java居多，现在这东西也能做服务器开发，可以少学一门语言，而且天生并发能力强。正合我胃口。就开始在网上找基于Node.js的博客。首先找到的是Ghost，一个声称比Wordpress更牛的软件：Markdown编辑、界面清爽、支持团队协作blabla。前后研究了大约一个月，文档全英文（有中文版但不是最新的）。昨天尝试安装的时候发现几个问题：</p>
-<ul>
-<li>安装速度慢，下载的包太大；</li>
-<li>支持的Node.js版本有限，官方文档上说只支持4.X LTS；我的机器上没有编译通过，运行不成功，后面的也没法评论了。</li>
-</ul>
-<p>开始尝试Plan B – Hexo。这东西是个静态博客，不跟数据库打交道，也是用Markdown编辑，Github上的点赞数大约是Ghost的一半，据说是台湾的一个大学生编出来的。评论大多是使用简单、能够托管在Github上。行吧，先用这个，写点东西。等能力到了，自己来改成想要的样子，或者切到Javascript版的Wordpress上。</p>
-<p>经过几个小时的学习和实践，已经能把博客发到网上，还更换了博客的主题。总体而言，这篇文章主要讲了我的博客是怎么来的，偏技术，说的也不细，喜欢的人不会多。但是我喜欢Ghost的广告语“Just Blogging”，有点什么东西都记下来，等到将来某个时间再次打开来看，心中也许会说，我是从那里走到这里的！</p>
-
-          
+          <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>第一篇博客，半夜起来瞎写一通。<br>
+          <div class="post-more-link text-center">
+            <a class="btn" href="/2016/07/17/Go-LeoBrilliant-Go/#more" rel="contents">
+              阅读全文 &raquo;
+            </a>
+          </div>
         
       
     </div>
@@ -1755,7 +1355,7 @@
       <section class="site-overview sidebar-panel  sidebar-panel-active ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
+               src="/uploads/LeoBrilliant.png"
                alt="LeoBrilliant" />
           <p class="site-author-name" itemprop="name">LeoBrilliant</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -1770,10 +1370,10 @@
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -1791,6 +1391,26 @@
         
 
         <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
           
         </div>
 

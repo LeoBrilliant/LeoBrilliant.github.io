@@ -84,37 +84,16 @@
 
 
 
-<meta name="description" content="1. 安装配置
-安装JDK。目前的JDK安装文件好像不用再设置classpath之类的东西。
-下载并安装ant，并ant运行程序地址加入环境变量%Path%。
-下载并安装插件，如SVN等。
-在命令行中运行如下命令12# 定义username属性，执行target1和target2，默认读取当前目录build.xml中配置$ant -Dusername=me target1 target2
-
-
-2.">
+<meta name="description" content="0. 摘要Ant安装配置及基本用法。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Ant实战">
 <meta property="og:url" content="https://leobriliiant.github.io/2016/07/30/Ant实战/index.html">
 <meta property="og:site_name" content="IAMLEOBRILLIANT">
-<meta property="og:description" content="1. 安装配置
-安装JDK。目前的JDK安装文件好像不用再设置classpath之类的东西。
-下载并安装ant，并ant运行程序地址加入环境变量%Path%。
-下载并安装插件，如SVN等。
-在命令行中运行如下命令12# 定义username属性，执行target1和target2，默认读取当前目录build.xml中配置$ant -Dusername=me target1 target2
-
-
-2.">
-<meta property="og:updated_time" content="2016-07-31T06:10:56.879Z">
+<meta property="og:description" content="0. 摘要Ant安装配置及基本用法。">
+<meta property="og:updated_time" content="2016-08-20T07:14:26.597Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Ant实战">
-<meta name="twitter:description" content="1. 安装配置
-安装JDK。目前的JDK安装文件好像不用再设置classpath之类的东西。
-下载并安装ant，并ant运行程序地址加入环境变量%Path%。
-下载并安装插件，如SVN等。
-在命令行中运行如下命令12# 定义username属性，执行target1和target2，默认读取当前目录build.xml中配置$ant -Dusername=me target1 target2
-
-
-2.">
+<meta name="twitter:description" content="0. 摘要Ant安装配置及基本用法。">
 
 
 
@@ -196,6 +175,16 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -323,7 +312,8 @@
       
 
       
-        <h1 id="1-安装配置"><a href="#1-安装配置" class="headerlink" title="1. 安装配置"></a>1. 安装配置</h1><ul>
+        <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>Ant安装配置及基本用法。<br><a id="more"></a></p>
+<h1 id="1-安装配置"><a href="#1-安装配置" class="headerlink" title="1. 安装配置"></a>1. 安装配置</h1><ul>
 <li>安装JDK。目前的JDK安装文件好像不用再设置classpath之类的东西。</li>
 <li>下载并安装ant，并ant运行程序地址加入环境变量%Path%。</li>
 <li>下载并安装插件，如SVN等。</li>
@@ -434,6 +424,12 @@
 
     <div class="post-spread">
       
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
     </div>
   </div>
 
@@ -483,7 +479,7 @@
       <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
+               src="/uploads/LeoBrilliant.png"
                alt="LeoBrilliant" />
           <p class="site-author-name" itemprop="name">LeoBrilliant</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -498,10 +494,10 @@
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -520,6 +516,26 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
         </div>
 
         
@@ -537,7 +553,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-安装配置"><span class="nav-number">1.</span> <span class="nav-text">1. 安装配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-中文不适合Properties"><span class="nav-number">2.</span> <span class="nav-text">2. 中文不适合Properties</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Ant使用指南"><span class="nav-number">3.</span> <span class="nav-text">3. Ant使用指南</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-项目基本设置"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 项目基本设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-SVN基本配置"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 SVN基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-设置构建目标"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 设置构建目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-文件-目录操作"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 文件/目录操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-条件变量的设置与使用"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 条件变量的设置与使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-SVN的使用"><span class="nav-number">3.6.</span> <span class="nav-text">3.6 SVN的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-SSH和SCP"><span class="nav-number">3.7.</span> <span class="nav-text">3.7 SSH和SCP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-CMD命令"><span class="nav-number">3.8.</span> <span class="nav-text">3.8 CMD命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Ant经验"><span class="nav-number">4.</span> <span class="nav-text">4. Ant经验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-重要网站"><span class="nav-number">5.</span> <span class="nav-text">5. 重要网站</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-摘要"><span class="nav-number">1.</span> <span class="nav-text">0. 摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-安装配置"><span class="nav-number">2.</span> <span class="nav-text">1. 安装配置</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-中文不适合Properties"><span class="nav-number">3.</span> <span class="nav-text">2. 中文不适合Properties</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-Ant使用指南"><span class="nav-number">4.</span> <span class="nav-text">3. Ant使用指南</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-项目基本设置"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 项目基本设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-SVN基本配置"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 SVN基本配置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-设置构建目标"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 设置构建目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-文件-目录操作"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 文件/目录操作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-条件变量的设置与使用"><span class="nav-number">4.5.</span> <span class="nav-text">3.5 条件变量的设置与使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-6-SVN的使用"><span class="nav-number">4.6.</span> <span class="nav-text">3.6 SVN的使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-7-SSH和SCP"><span class="nav-number">4.7.</span> <span class="nav-text">3.7 SSH和SCP</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-8-CMD命令"><span class="nav-number">4.8.</span> <span class="nav-text">3.8 CMD命令</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-Ant经验"><span class="nav-number">5.</span> <span class="nav-text">4. Ant经验</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-重要网站"><span class="nav-number">6.</span> <span class="nav-text">5. 重要网站</span></a></li></ol></div>
             
           </div>
         </section>

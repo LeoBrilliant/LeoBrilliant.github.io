@@ -84,16 +84,16 @@
 
 
 
-<meta name="description" content="1. 背景介绍之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来">
+<meta name="description" content="0. 摘要在Cygwin中使用Log4CPlus，还有示例代码。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="在Cygwin中使用Log4CPlus">
 <meta property="og:url" content="https://leobriliiant.github.io/2016/08/16/在Cygwin中使用Log4CPlus/index.html">
 <meta property="og:site_name" content="IAMLEOBRILLIANT">
-<meta property="og:description" content="1. 背景介绍之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来">
-<meta property="og:updated_time" content="2016-08-16T14:05:54.621Z">
+<meta property="og:description" content="0. 摘要在Cygwin中使用Log4CPlus，还有示例代码。">
+<meta property="og:updated_time" content="2016-08-20T07:17:12.066Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="在Cygwin中使用Log4CPlus">
-<meta name="twitter:description" content="1. 背景介绍之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来">
+<meta name="twitter:description" content="0. 摘要在Cygwin中使用Log4CPlus，还有示例代码。">
 
 
 
@@ -175,6 +175,16 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -302,7 +312,8 @@
       
 
       
-        <h1 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h1><p>之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来有点凌乱，而且想关闭日志输出，就要注释掉对应的代码，重新编译代码，一次两次还勉强可以接受，如果要成百上千次，累积起来的等待时间还是非常漫长。不想自己从头写一个日志模块，决定在系统级的项目或代码中引入开源的日志框架，因为已经有成熟的开源代码，花点时间学习，把更多的时间留给设计和编写业务模块。</p>
+        <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>在Cygwin中使用Log4CPlus，还有示例代码。<br><a id="more"></a></p>
+<h1 id="1-背景介绍"><a href="#1-背景介绍" class="headerlink" title="1. 背景介绍"></a>1. 背景介绍</h1><p>之前用C++写了一个OpenTS，将近两万行代码。只是出于练手的目的，前后两个月一有时间就coding和debugging，最后终于能跑起来。一个健壮可靠的系统需要有一个完善的日志模块，在系统运行起来之后就有途径的了解系统运行的状态，发生故障之后能快速定位故障的位置、原因，为排除故障提供有效线索。写的这个OpenTS，所有的输出都是对printf或者cout的简单封装，所以代码看起来有点凌乱，而且想关闭日志输出，就要注释掉对应的代码，重新编译代码，一次两次还勉强可以接受，如果要成百上千次，累积起来的等待时间还是非常漫长。不想自己从头写一个日志模块，决定在系统级的项目或代码中引入开源的日志框架，因为已经有成熟的开源代码，花点时间学习，把更多的时间留给设计和编写业务模块。</p>
 <p>在开源C++日志框架选型的时候，备选的有log4cxx、log4cplus、glog、log4cpp等。glog据说是Google出品，主页正常情况下打不开，源代码也下不到。log4cxx和log4cpp，有个是Apache基金的开源项目之一，但是感觉很久都没有发布新版本。log4cplus还比较活跃，去年研究的时候是1.1.3，现在出到1.2.0，网上说功能比较全面，应该能满足日常使用。log4*系列都是log4j的衍生品。而log4j可以说是Java日志框架的标准，那么对其他语言的派生也不会太差吧。先用起来。</p>
 <p>刚开始学log4cplus的时候，各种困难。设计复杂，支持向屏幕、文件、网络输出日志，还可以在代码中设置或者在配置文件中配置日志的选项或者格式，还有很多开关。看了很多网络上的文章，都很长，讲得也算全面吧，等到具体应用的时候，就开始各种报错。那时候用的VS2012，源代码里提供了VS2010的工程文件，项目升级之后，编译也没啥问题，但是把生成的库链接到其他项目之后，发现log4cplus相关的函数找不到。过程、步骤都没什么问题，来来回回折腾了一整天，一个偶然的机会，发现是要编译成Debug输出格式的dll，然后还是要带什么U的一个dll，我靠。这就是很多人不喜欢技术的原因，为了克服一个问题，要花去大量的时间尝试。问题解决之后在其他人看来又不是什么很有价值的问题。更多的人是在尝试中放弃了，或者根本不愿意去尝试。这也从侧面说明网络上的文章质量不高，这类基础开源项目的文档不完善。所以一直呼吁或者要求，如果要写文档，不光是自己能看懂，而且其他人也能看懂，并且照着文档一步一步做能顺利的实现文档设定的目标。</p>
 <p>对VS的厌恶程度逐步提升。现在已经切到Cygwin。这次准备在Cygwin上编译log4cplus，如果这能成功，那么在Linux上使用也没什么问题。</p>
@@ -388,6 +399,12 @@
 
     <div class="post-spread">
       
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
     </div>
   </div>
 
@@ -437,7 +454,7 @@
       <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
+               src="/uploads/LeoBrilliant.png"
                alt="LeoBrilliant" />
           <p class="site-author-name" itemprop="name">LeoBrilliant</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -452,10 +469,10 @@
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -474,6 +491,26 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
         </div>
 
         
@@ -491,7 +528,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-背景介绍"><span class="nav-number">1.</span> <span class="nav-text">1. 背景介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-使用步骤"><span class="nav-number">2.</span> <span class="nav-text">2. 使用步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-示例代码"><span class="nav-number">3.</span> <span class="nav-text">3. 示例代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-解决的问题"><span class="nav-number">4.</span> <span class="nav-text">3. 解决的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-参考文献"><span class="nav-number">5.</span> <span class="nav-text">4. 参考文献</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-摘要"><span class="nav-number">1.</span> <span class="nav-text">0. 摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-背景介绍"><span class="nav-number">2.</span> <span class="nav-text">1. 背景介绍</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-使用步骤"><span class="nav-number">3.</span> <span class="nav-text">2. 使用步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-示例代码"><span class="nav-number">4.</span> <span class="nav-text">3. 示例代码</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-解决的问题"><span class="nav-number">5.</span> <span class="nav-text">3. 解决的问题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-参考文献"><span class="nav-number">6.</span> <span class="nav-text">4. 参考文献</span></a></li></ol></div>
             
           </div>
         </section>

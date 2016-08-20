@@ -84,16 +84,16 @@
 
 
 
-<meta name="description" content="1. 问题描述今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功">
+<meta name="description" content="0. 摘要解决Oracle在关闭过程中无法写入归档日志的问题。">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Oracle关闭失败Ora-19809">
 <meta property="og:url" content="https://leobriliiant.github.io/2016/08/18/Oracle关闭失败Ora-19809/index.html">
 <meta property="og:site_name" content="IAMLEOBRILLIANT">
-<meta property="og:description" content="1. 问题描述今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功">
-<meta property="og:updated_time" content="2016-08-18T13:25:35.237Z">
+<meta property="og:description" content="0. 摘要解决Oracle在关闭过程中无法写入归档日志的问题。">
+<meta property="og:updated_time" content="2016-08-20T07:10:58.643Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Oracle关闭失败Ora-19809">
-<meta name="twitter:description" content="1. 问题描述今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功">
+<meta name="twitter:description" content="0. 摘要解决Oracle在关闭过程中无法写入归档日志的问题。">
 
 
 
@@ -175,6 +175,16 @@
               <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
             
             首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
           </a>
         </li>
       
@@ -302,7 +312,8 @@
       
 
       
-        <h1 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h1><p>今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功能，剩下二三十G空间去哪里了？根据经验，看了下几个可能生成日志比较多的用户，都没有进程在运行，那么这些磁盘应该是被Oracle吃了。到Oracle目录下，执行了清理空间的脚本，就是通过sqlplus执行一些命令，看到屏幕上打出&gt;shutdown immediate; 许久，根据经验，Oracle关闭出现状况。去看Oracle日志，系统在飞速的写一条错误信息，大意是归档日志文件大小达到了限制，写入某条归档日志失败，错误号ORA-19809，后面跟了几个解决方案。因为现在是在关闭的过程中，sqlplus能够登录但是没有办法进行操作，报”shutdown in progress xxx”，输入&gt;shutdown abort;都报”ORA-01031 insufficient privileges”，RMAN也登录不上。几乎绝望。为了不影响开发进度，让同事连其他环境。我决定凭借使用Oracle多年的经验，看能否挽救该环境于危亡之际，不行就重置。借助百度与之前的积累，成功让该环境正常运行，代价是删除了之前的还原点，对开发测试没有实际影响，心中略有成就感。特把拯救过程记录下来。不过需要提醒，在生产环境中慎用。</p>
+        <h1 id="0-摘要"><a href="#0-摘要" class="headerlink" title="0. 摘要"></a>0. 摘要</h1><p>解决Oracle在关闭过程中无法写入归档日志的问题。<br><a id="more"></a></p>
+<h1 id="1-问题描述"><a href="#1-问题描述" class="headerlink" title="1. 问题描述"></a>1. 问题描述</h1><p>今天上午有同事说XX环境连不上。昨天还好好的，在没有什么人为改动的情况下连接失败，应该是系统自身的问题。SSH登录到环境上一看，磁盘使用率100%，可用空间为0。这样连接不上是很正常的，通信层需要写日志，如果没有地方存日志，那么很多操作就会失败，登录失败也算正常。停掉通信层，清理已有的通信日志，剩余8%的可用空间。心生狐疑，几周前来看还有40多G的空间，而且也没有什么写操作特别大的功能，剩下二三十G空间去哪里了？根据经验，看了下几个可能生成日志比较多的用户，都没有进程在运行，那么这些磁盘应该是被Oracle吃了。到Oracle目录下，执行了清理空间的脚本，就是通过sqlplus执行一些命令，看到屏幕上打出&gt;shutdown immediate; 许久，根据经验，Oracle关闭出现状况。去看Oracle日志，系统在飞速的写一条错误信息，大意是归档日志文件大小达到了限制，写入某条归档日志失败，错误号ORA-19809，后面跟了几个解决方案。因为现在是在关闭的过程中，sqlplus能够登录但是没有办法进行操作，报”shutdown in progress xxx”，输入&gt;shutdown abort;都报”ORA-01031 insufficient privileges”，RMAN也登录不上。几乎绝望。为了不影响开发进度，让同事连其他环境。我决定凭借使用Oracle多年的经验，看能否挽救该环境于危亡之际，不行就重置。借助百度与之前的积累，成功让该环境正常运行，代价是删除了之前的还原点，对开发测试没有实际影响，心中略有成就感。特把拯救过程记录下来。不过需要提醒，在生产环境中慎用。</p>
 <h1 id="2-详细步骤"><a href="#2-详细步骤" class="headerlink" title="2. 详细步骤"></a>2. 详细步骤</h1><ol>
 <li>关闭其他数据库实例</li>
 </ol>
@@ -384,6 +395,12 @@
 
     <div class="post-spread">
       
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
     </div>
   </div>
 
@@ -433,7 +450,7 @@
       <section class="site-overview sidebar-panel ">
         <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
           <img class="site-author-image" itemprop="image"
-               src="/images/avatar.gif"
+               src="/uploads/LeoBrilliant.png"
                alt="LeoBrilliant" />
           <p class="site-author-name" itemprop="name">LeoBrilliant</p>
           <p class="site-description motion-element" itemprop="description"></p>
@@ -448,10 +465,10 @@
 
           
             <div class="site-state-item site-state-categories">
-              
+              <a href="/categories">
                 <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">分类</span>
-              
+              </a>
             </div>
           
 
@@ -470,6 +487,26 @@
 
         <div class="links-of-author motion-element">
           
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
         </div>
 
         
@@ -487,7 +524,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-问题描述"><span class="nav-number">1.</span> <span class="nav-text">1. 问题描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-详细步骤"><span class="nav-number">2.</span> <span class="nav-text">2. 详细步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-经验教训"><span class="nav-number">3.</span> <span class="nav-text">3. 经验教训</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-摘要"><span class="nav-number">1.</span> <span class="nav-text">0. 摘要</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-问题描述"><span class="nav-number">2.</span> <span class="nav-text">1. 问题描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-详细步骤"><span class="nav-number">3.</span> <span class="nav-text">2. 详细步骤</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-经验教训"><span class="nav-number">4.</span> <span class="nav-text">3. 经验教训</span></a></li></ol></div>
             
           </div>
         </section>
