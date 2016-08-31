@@ -1,0 +1,822 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="笔记,Pandas,Python," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="【摘要】快速了解Pandas的入门使用方法。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="10分钟快速了解Pandas">
+<meta property="og:url" content="https://leobriliiant.github.io/2016/08/31/10分钟快速了解Pandas/index.html">
+<meta property="og:site_name" content="IAMLEOBRILLIANT">
+<meta property="og:description" content="【摘要】快速了解Pandas的入门使用方法。">
+<meta property="og:updated_time" content="2016-08-31T13:27:27.481Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="10分钟快速了解Pandas">
+<meta name="twitter:description" content="【摘要】快速了解Pandas的入门使用方法。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://leobriliiant.github.io/2016/08/31/10分钟快速了解Pandas/"/>
+
+  <title> 10分钟快速了解Pandas | IAMLEOBRILLIANT </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IAMLEOBRILLIANT</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Run Forest! Run!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                10分钟快速了解Pandas
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-08-31T21:23:35+08:00" content="2016-08-31">
+              2016-08-31
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/08/31/10分钟快速了解Pandas/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/08/31/10分钟快速了解Pandas/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>【摘要】<br>快速了解Pandas的入门使用方法。<br><a id="more"></a></p>
+<h1 id="0-需要导入的Package"><a href="#0-需要导入的Package" class="headerlink" title="0. 需要导入的Package"></a>0. 需要导入的Package</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</div><div class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</div><div class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</div></pre></td></tr></table></figure>
+<h1 id="1-创建对象"><a href="#1-创建对象" class="headerlink" title="1. 创建对象"></a>1. 创建对象</h1><ul>
+<li><p>传入一个list来创建Series，pandas创建默认整数index</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">s = pd.Series([<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, np.nan, <span class="number">6</span>, <span class="number">8</span>])</div></pre></td></tr></table></figure>
+</li>
+<li><p>传入一个numpy array来创建DataFrame，带有datetime index 和列标签</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">dates = pd.date_range(<span class="string">'20130101'</span>, periods=<span class="number">6</span>)</div><div class="line">df = pd.DataFrame(np.random.randn(<span class="number">6</span>, <span class="number">4</span>), index=dates, columns=list(<span class="string">'ABCD'</span>))</div></pre></td></tr></table></figure>
+</li>
+<li><p>传入一个由可以转换成类似series的objects组成的dict</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">10</span>]: df2 = pd.DataFrame(&#123; <span class="string">'A'</span> : <span class="number">1.</span>,</div><div class="line">   ....:                      <span class="string">'B'</span> : pd.Timestamp(<span class="string">'20130102'</span>),</div><div class="line">   ....:                      <span class="string">'C'</span> : pd.Series(<span class="number">1</span>,index=list(range(<span class="number">4</span>)),dtype=<span class="string">'float32'</span>),</div><div class="line">   ....:                      <span class="string">'D'</span> : np.array([<span class="number">3</span>] * <span class="number">4</span>,dtype=<span class="string">'int32'</span>),</div><div class="line">   ....:                      <span class="string">'E'</span> : pd.Categorical([<span class="string">"test"</span>,<span class="string">"train"</span>,<span class="string">"test"</span>,<span class="string">"train"</span>]),</div><div class="line">   ....:                      <span class="string">'F'</span> : <span class="string">'foo'</span> &#125;)</div><div class="line">   ....:</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>每一列有特定的dtypes。IPython具有<tab>提示和自动补全功能。</tab></p>
+<h1 id="2-查看数据"><a href="#2-查看数据" class="headerlink" title="2. 查看数据"></a>2. 查看数据</h1><ul>
+<li><p>查看frame顶端或底端的行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.head()</div><div class="line">df.tail(<span class="number">3</span>)</div></pre></td></tr></table></figure>
+</li>
+<li><p>展示index、列标签、底层numpy数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">df.index</div><div class="line">df.columns</div><div class="line">df.values</div></pre></td></tr></table></figure>
+</li>
+<li><p>获取数据的快速统计概要</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.describe()</div></pre></td></tr></table></figure>
+</li>
+<li><p>数据转置</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.T</div></pre></td></tr></table></figure>
+</li>
+<li><p>按轴排序</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.sort_index(axis=<span class="number">1</span>, ascending=<span class="keyword">False</span>)</div></pre></td></tr></table></figure>
+</li>
+<li><p>按值排序</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.sort_values(by=<span class="string">'B'</span>)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="3-选择"><a href="#3-选择" class="headerlink" title="3. 选择"></a>3. 选择</h1><ul>
+<li><p>选择单独一列，返回Series</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df[<span class="string">'A'</span>]</div><div class="line"><span class="comment"># 与df.A等价</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>切片选行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df[<span class="number">0</span>:<span class="number">3</span>]</div><div class="line"><span class="comment"># 选择0，1，2</span></div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="3-1-通过标签获取"><a href="#3-1-通过标签获取" class="headerlink" title="3.1 通过标签获取"></a>3.1 通过标签获取</h2><ul>
+<li><p>使用label获得交叉局域</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.loc[dates[<span class="number">0</span>]]</div></pre></td></tr></table></figure>
+</li>
+<li><p>通过label选择多维数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.loc[:, [<span class="string">'A'</span>, <span class="string">'B'</span>]]</div></pre></td></tr></table></figure>
+</li>
+<li><p>label切片，包含端点</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.loc[<span class="string">'20130102'</span>:<span class="string">'20130104'</span>, [<span class="string">'A'</span>, <span class="string">'B'</span>]]</div></pre></td></tr></table></figure>
+</li>
+<li><p>返回对象降维</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.loc[<span class="string">'20130102'</span>, [<span class="string">'A'</span>,<span class="string">'B'</span>]]</div></pre></td></tr></table></figure>
+</li>
+<li><p>获取标量数据</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.loc[dates[<span class="number">0</span>], <span class="string">'A'</span>]</div><div class="line">df.at[dates[<span class="number">0</span>], <span class="string">'A'</span>]</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="3-2-通过位置获取"><a href="#3-2-通过位置获取" class="headerlink" title="3.2 通过位置获取"></a>3.2 通过位置获取</h2><ul>
+<li><p>通过位置选择</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.iloc[<span class="number">3</span>]</div></pre></td></tr></table></figure>
+</li>
+<li><p>整数切片</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.iloc[<span class="number">3</span>:<span class="number">5</span>, <span class="number">0</span>:<span class="number">2</span>]</div><div class="line"><span class="comment"># 用法与numpy/python类似</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>整数位置列表</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.iloc[[<span class="number">1</span>, <span class="number">2</span>, <span class="number">4</span>], [<span class="number">0</span>, <span class="number">2</span>]]</div><div class="line"><span class="comment"># 用法与numpy/python类似</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>切片</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.iloc[<span class="number">1</span>:<span class="number">3</span>, :]</div><div class="line">df.iloc[:, <span class="number">1</span>:<span class="number">3</span>]</div></pre></td></tr></table></figure>
+</li>
+<li><p>定位取值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.iloc[<span class="number">1</span>, <span class="number">1</span>]</div><div class="line">df.iat[<span class="number">1</span>, <span class="number">1</span>]</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="3-3-布尔索引"><a href="#3-3-布尔索引" class="headerlink" title="3.3 布尔索引"></a>3.3 布尔索引</h2><ul>
+<li><p>使用一列数据进行选择</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df[df.A &gt; <span class="number">0</span>]</div></pre></td></tr></table></figure>
+</li>
+<li><p>取值时的where操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df[df &gt; <span class="number">0</span>]</div></pre></td></tr></table></figure>
+</li>
+<li><p>使用isin()过滤</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df2[df2[<span class="string">'E'</span>].isin([<span class="string">'two'</span>, <span class="string">'four'</span>])]</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="3-4-赋值"><a href="#3-4-赋值" class="headerlink" title="3.4 赋值"></a>3.4 赋值</h2><ul>
+<li><p>为DataFrame附加新列时，自动按索引对齐</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">s1 = pd.Series([<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>], index=pd.date_range(<span class="string">'20130102'</span>, periods=<span class="number">6</span>))</div><div class="line">df[<span class="string">'F'</span>] = s1</div></pre></td></tr></table></figure>
+</li>
+<li><p>通过label或位置赋值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.at[dates[<span class="number">0</span>], <span class="string">'A'</span>] = <span class="number">0</span></div><div class="line">df.iat[<span class="number">0</span>, <span class="number">1</span>] = <span class="number">0</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>通过numpy array赋值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.loc[:, <span class="string">'D'</span>] = np.array([<span class="number">5</span>] * len(df))</div></pre></td></tr></table></figure>
+</li>
+<li><p>赋值时的where操作</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df2[df2 &gt; <span class="number">0</span>] = -df2</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="4-缺失数据"><a href="#4-缺失数据" class="headerlink" title="4. 缺失数据"></a>4. 缺失数据</h1><p>pandas主要使用np.nan来表示缺失值。缺失值默认不包含在计算中。</p>
+<ul>
+<li><p>reindex可以在特定维度上改变/增加/删除index，返回原数据的拷贝。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df1 = df.reindex(index=dates[<span class="number">0</span>:<span class="number">4</span>], columns=list(df.columns) + [<span class="string">'E'</span>])</div><div class="line">df1.loc[dates[<span class="number">0</span>]:dates[<span class="number">1</span>], <span class="string">'E'</span>] = <span class="number">1</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>drop含有缺失值的行</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df1.dropna(how=<span class="string">'any'</span>)</div></pre></td></tr></table></figure>
+</li>
+<li><p>填充缺失值</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df1.fillna(value = <span class="number">5</span>)</div></pre></td></tr></table></figure>
+</li>
+<li><p>获取原始数据是否为nan的掩码</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">pd.isnull(df1)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="5-操作"><a href="#5-操作" class="headerlink" title="5. 操作"></a>5. 操作</h1><h2 id="5-1-统计"><a href="#5-1-统计" class="headerlink" title="5.1 统计"></a>5.1 统计</h2><p>操作通常排除缺失值</p>
+<ul>
+<li><p>执行描述性统计</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">df.mean()</div><div class="line">df.mean(<span class="number">1</span>)</div><div class="line"><span class="comment"># 在另一个维度上执行统计</span></div></pre></td></tr></table></figure>
+</li>
+<li><p>在不同维度的对象上执行操作需要对齐，pandas自动在特定维度上进行广播</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">s = pd.Series([<span class="number">1</span>, <span class="number">3</span>, <span class="number">5</span>, np.nan, <span class="number">6</span>, <span class="number">8</span>], index=dates).shift(<span class="number">2</span>)</div><div class="line">df.sub(s, axis=<span class="string">'index'</span>)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="5-2-Apply"><a href="#5-2-Apply" class="headerlink" title="5.2 Apply"></a>5.2 Apply</h2><ul>
+<li>在数据上应用函数<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">df.apply(np.cumsum)</div><div class="line">df.apply(<span class="keyword">lambda</span> x: x.max() - x.min())</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="5-3-直方统计"><a href="#5-3-直方统计" class="headerlink" title="5.3 直方统计"></a>5.3 直方统计</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">s = pd.Series(np.random.randint(<span class="number">0</span>, <span class="number">7</span>, size=<span class="number">10</span>)</div><div class="line">s.value_counts()</div></pre></td></tr></table></figure>
+<h2 id="5-4-字符串方法"><a href="#5-4-字符串方法" class="headerlink" title="5.4 字符串方法"></a>5.4 字符串方法</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">s = pd.Series([<span class="string">'A'</span>, <span class="string">'B'</span>, <span class="string">'C'</span>, <span class="string">'Aaba'</span>, <span class="string">'Baca'</span>, np.nan, <span class="string">'CABA'</span>, <span class="string">'dog'</span>, <span class="string">'cat'</span>])</div><div class="line"></div><div class="line">s.str.lower()</div></pre></td></tr></table></figure>
+<h1 id="6-合并"><a href="#6-合并" class="headerlink" title="6. 合并"></a>6. 合并</h1><h2 id="6-1-连接Concat"><a href="#6-1-连接Concat" class="headerlink" title="6.1 连接Concat"></a>6.1 连接Concat</h2><ul>
+<li>用concat()将pandas对象连接在一起<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">df = pd.DataFrame(np.random.randn(<span class="number">10</span>, <span class="number">4</span>))</div><div class="line">pieces = [df[:<span class="number">3</span>], df[<span class="number">3</span>:<span class="number">7</span>], df[<span class="number">7</span>:]]</div><div class="line">pd.concat(pieces)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="6-2-连接Join"><a href="#6-2-连接Join" class="headerlink" title="6.2 连接Join"></a>6.2 连接Join</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">left = pd.DataFrame(&#123;<span class="string">'key'</span>: [<span class="string">'foo'</span>, <span class="string">'foo'</span>], <span class="string">'lval'</span>: [<span class="number">1</span>, <span class="number">2</span>]&#125;)</div><div class="line">right = pd.DataFrame(&#123;<span class="string">'key'</span>: [<span class="string">'foo'</span>, <span class="string">'foo'</span>], <span class="string">'rval'</span>: [<span class="number">4</span>, <span class="number">5</span>]&#125;)</div><div class="line">pd.merge(left, right, on=<span class="string">'key'</span>)</div></pre></td></tr></table></figure>
+<h2 id="6-3-附加Append"><a href="#6-3-附加Append" class="headerlink" title="6.3 附加Append"></a>6.3 附加Append</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">df = pd.DataFrame(np.random.randn(<span class="number">8</span>, <span class="number">4</span>), columns=[<span class="string">'A'</span>,<span class="string">'B'</span>,<span class="string">'C'</span>,<span class="string">'D'</span>])</div><div class="line">s = df.iloc[<span class="number">3</span>]</div><div class="line">df.append(s, ignore_index=<span class="keyword">True</span>)</div></pre></td></tr></table></figure>
+<h1 id="7-分组"><a href="#7-分组" class="headerlink" title="7. 分组"></a>7. 分组</h1><p>“group by”代表一项或者多项一下过程：</p>
+<ul>
+<li>Splitting</li>
+<li>Applying</li>
+<li>Combining</li>
+<li><p>分组，在结果中应用sum函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">86</span>]: df = pd.DataFrame(&#123;<span class="string">'A'</span> : [<span class="string">'foo'</span>, <span class="string">'bar'</span>, <span class="string">'foo'</span>, <span class="string">'bar'</span>,</div><div class="line">   ....:                           <span class="string">'foo'</span>, <span class="string">'bar'</span>, <span class="string">'foo'</span>, <span class="string">'foo'</span>],</div><div class="line">   ....:                    <span class="string">'B'</span> : [<span class="string">'one'</span>, <span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>,</div><div class="line">   ....:                           <span class="string">'two'</span>, <span class="string">'two'</span>, <span class="string">'one'</span>, <span class="string">'three'</span>],</div><div class="line">   ....:                    <span class="string">'C'</span> : np.random.randn(<span class="number">8</span>),</div><div class="line">   ....:                    <span class="string">'D'</span> : np.random.randn(<span class="number">8</span>)&#125;)</div><div class="line"></div><div class="line">df.groupby(<span class="string">'A'</span>).sum()</div></pre></td></tr></table></figure>
+</li>
+<li><p>按多列分组形成分层index，然后应用函数</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.groupby([<span class="string">'A'</span>, <span class="string">'B'</span>]).sum()</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="8-重构Reshaping"><a href="#8-重构Reshaping" class="headerlink" title="8. 重构Reshaping"></a>8. 重构Reshaping</h1><h2 id="8-1-堆Stack"><a href="#8-1-堆Stack" class="headerlink" title="8.1 堆Stack"></a>8.1 堆Stack</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">90</span>]: tuples = list(zip(*[[<span class="string">'bar'</span>, <span class="string">'bar'</span>, <span class="string">'baz'</span>, <span class="string">'baz'</span>,</div><div class="line">   ....:                      <span class="string">'foo'</span>, <span class="string">'foo'</span>, <span class="string">'qux'</span>, <span class="string">'qux'</span>],</div><div class="line">   ....:                     [<span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'one'</span>, <span class="string">'two'</span>,</div><div class="line">   ....:                      <span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'one'</span>, <span class="string">'two'</span>]]))</div><div class="line">   ....:</div><div class="line"></div><div class="line">In [<span class="number">91</span>]: index = pd.MultiIndex.from_tuples(tuples, names=[<span class="string">'first'</span>, <span class="string">'second'</span>])</div><div class="line"></div><div class="line">In [<span class="number">92</span>]: df = pd.DataFrame(np.random.randn(<span class="number">8</span>, <span class="number">2</span>), index=index, columns=[<span class="string">'A'</span>, <span class="string">'B'</span>])</div><div class="line"></div><div class="line">In [<span class="number">93</span>]: df2 = df[:<span class="number">4</span>]</div></pre></td></tr></table></figure>
+<ul>
+<li>stack()方法将DataFrame的列转化行</li>
+<li>unstack()方法是stack方法的逆操作，默认按last level进行<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">stacked = df2.stack()</div><div class="line">stacked.unstack()</div><div class="line">stacked.unstack(<span class="number">1</span>)</div><div class="line">stacked.unstack(<span class="number">0</span>)</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h2 id="8-2-透视表Pivot-Tables"><a href="#8-2-透视表Pivot-Tables" class="headerlink" title="8.2 透视表Pivot Tables"></a>8.2 透视表Pivot Tables</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">100</span>]: df = pd.DataFrame(&#123;<span class="string">'A'</span> : [<span class="string">'one'</span>, <span class="string">'one'</span>, <span class="string">'two'</span>, <span class="string">'three'</span>] * <span class="number">3</span>,</div><div class="line">   .....:                    <span class="string">'B'</span> : [<span class="string">'A'</span>, <span class="string">'B'</span>, <span class="string">'C'</span>] * <span class="number">4</span>,</div><div class="line">   .....:                    <span class="string">'C'</span> : [<span class="string">'foo'</span>, <span class="string">'foo'</span>, <span class="string">'foo'</span>, <span class="string">'bar'</span>, <span class="string">'bar'</span>, <span class="string">'bar'</span>] * <span class="number">2</span>,</div><div class="line">   .....:                    <span class="string">'D'</span> : np.random.randn(<span class="number">12</span>),</div><div class="line">   .....:                    <span class="string">'E'</span> : np.random.randn(<span class="number">12</span>)&#125;</div><div class="line">In [<span class="number">102</span>]: pd.pivot_table(df, values=<span class="string">'D'</span>, index=[<span class="string">'A'</span>, <span class="string">'B'</span>], columns=[<span class="string">'C'</span>])</div></pre></td></tr></table></figure>
+<h1 id="9-时间系列Time-Series"><a href="#9-时间系列Time-Series" class="headerlink" title="9. 时间系列Time Series"></a>9. 时间系列Time Series</h1><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">103</span>]: rng = pd.date_range(<span class="string">'1/1/2012'</span>, periods=<span class="number">100</span>, freq=<span class="string">'S'</span>)</div><div class="line"></div><div class="line">In [<span class="number">104</span>]: ts = pd.Series(np.random.randint(<span class="number">0</span>, <span class="number">500</span>, len(rng)), index=rng)</div><div class="line"></div><div class="line">In [<span class="number">105</span>]: ts.resample(<span class="string">'5Min'</span>).sum()</div></pre></td></tr></table></figure>
+<ul>
+<li><p>时区表示法</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">106</span>]: rng = pd.date_range(<span class="string">'3/6/2012 00:00'</span>, periods=<span class="number">5</span>, freq=<span class="string">'D'</span>)</div><div class="line"></div><div class="line">In [<span class="number">107</span>]: ts = pd.Series(np.random.randn(len(rng)), rng)</div><div class="line"></div><div class="line">In [<span class="number">109</span>]: ts_utc = ts.tz_localize(<span class="string">'UTC'</span>)</div><div class="line"></div><div class="line">In [<span class="number">111</span>]: ts_utc.tz_convert(<span class="string">'US/Eastern'</span>)</div><div class="line"></div><div class="line">In [<span class="number">112</span>]: rng = pd.date_range(<span class="string">'1/1/2012'</span>, periods=<span class="number">5</span>, freq=<span class="string">'M'</span>)</div><div class="line"></div><div class="line">In [<span class="number">113</span>]: ts = pd.Series(np.random.randn(len(rng)), index=rng</div><div class="line"></div><div class="line">ps = ts.to_period()</div><div class="line"></div><div class="line">ps.to_timestamp()</div></pre></td></tr></table></figure>
+</li>
+<li><p>时间转换</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">118</span>]: prng = pd.period_range(<span class="string">'1990Q1'</span>, <span class="string">'2000Q4'</span>, freq=<span class="string">'Q-NOV'</span>)</div><div class="line"></div><div class="line">In [<span class="number">119</span>]: ts = pd.Series(np.random.randn(len(prng)), prng)</div><div class="line"></div><div class="line">In [<span class="number">120</span>]: ts.index = (prng.asfreq(<span class="string">'M'</span>, <span class="string">'e'</span>) + <span class="number">1</span>).asfreq(<span class="string">'H'</span>, <span class="string">'s'</span>) + <span class="number">9</span></div><div class="line"></div><div class="line">In [<span class="number">121</span>]: ts.head()</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="10-分类"><a href="#10-分类" class="headerlink" title="10. 分类"></a>10. 分类</h1><ul>
+<li>将原始数据转换成分类数据类型<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div></pre></td><td class="code"><pre><div class="line">In [<span class="number">122</span>]: df = pd.DataFrame(&#123;<span class="string">"id"</span>:[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>,<span class="number">5</span>,<span class="number">6</span>], <span class="string">"raw_grade"</span>:[<span class="string">'a'</span>, <span class="string">'b'</span>, <span class="string">'b'</span>, <span class="string">'a'</span>, <span class="string">'a'</span>, <span class="string">'e'</span>]&#125;)</div><div class="line"></div><div class="line">In [<span class="number">123</span>]: df[<span class="string">"grade"</span>] = df[<span class="string">"raw_grade"</span>].astype(<span class="string">"category"</span>)</div><div class="line"><span class="comment"># 使用有意义的名称</span></div><div class="line">In [<span class="number">125</span>]: df[<span class="string">"grade"</span>].cat.categories = [<span class="string">"very good"</span>, <span class="string">"good"</span>, <span class="string">"very bad"</span>]</div><div class="line"><span class="comment"># 重新排序，补充缺失的分类</span></div><div class="line">In [<span class="number">126</span>]: df[<span class="string">"grade"</span>] = df[<span class="string">"grade"</span>].cat.set_categories([<span class="string">"very bad"</span>, <span class="string">"bad"</span>, <span class="string">"medium"</span>, <span class="string">"good"</span>, <span class="string">"very good"</span>])</div><div class="line"><span class="comment"># 排序</span></div><div class="line">In [<span class="number">128</span>]: df.sort_values(by=<span class="string">"grade"</span>)</div><div class="line"><span class="comment"># 分组</span></div><div class="line">In [<span class="number">129</span>]: df.groupby(<span class="string">"grade"</span>).size()</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="11-画图Plotting"><a href="#11-画图Plotting" class="headerlink" title="11. 画图Plotting"></a>11. 画图Plotting</h1><h1 id="12-数据存取"><a href="#12-数据存取" class="headerlink" title="12. 数据存取"></a>12. 数据存取</h1><h1 id="13-参考文献"><a href="#13-参考文献" class="headerlink" title="13. 参考文献"></a>13. 参考文献</h1><p><a href="http://pandas.pydata.org/pandas-docs/stable/10min.html" target="_blank" rel="external">http://pandas.pydata.org/pandas-docs/stable/10min.html</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/笔记/" rel="tag">#笔记</a>
+          
+            <a href="/tags/Pandas/" rel="tag">#Pandas</a>
+          
+            <a href="/tags/Python/" rel="tag">#Python</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/18/Oracle关闭失败Ora-19809/" rel="next" title="Oracle关闭失败Ora-19809">
+                <i class="fa fa-chevron-left"></i> Oracle关闭失败Ora-19809
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/08/31/10分钟快速了解Pandas/"
+           data-title="10分钟快速了解Pandas" data-url="https://leobriliiant.github.io/2016/08/31/10分钟快速了解Pandas/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/LeoBrilliant.png"
+               alt="LeoBrilliant" />
+          <p class="site-author-name" itemprop="name">LeoBrilliant</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">10</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">18</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#0-需要导入的Package"><span class="nav-number">1.</span> <span class="nav-text">0. 需要导入的Package</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1-创建对象"><span class="nav-number">2.</span> <span class="nav-text">1. 创建对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-查看数据"><span class="nav-number">3.</span> <span class="nav-text">2. 查看数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-选择"><span class="nav-number">4.</span> <span class="nav-text">3. 选择</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-通过标签获取"><span class="nav-number">4.1.</span> <span class="nav-text">3.1 通过标签获取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-通过位置获取"><span class="nav-number">4.2.</span> <span class="nav-text">3.2 通过位置获取</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-布尔索引"><span class="nav-number">4.3.</span> <span class="nav-text">3.3 布尔索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-赋值"><span class="nav-number">4.4.</span> <span class="nav-text">3.4 赋值</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-缺失数据"><span class="nav-number">5.</span> <span class="nav-text">4. 缺失数据</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-操作"><span class="nav-number">6.</span> <span class="nav-text">5. 操作</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-统计"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-Apply"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 Apply</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-直方统计"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 直方统计</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-字符串方法"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 字符串方法</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-合并"><span class="nav-number">7.</span> <span class="nav-text">6. 合并</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-连接Concat"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 连接Concat</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-连接Join"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 连接Join</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-3-附加Append"><span class="nav-number">7.3.</span> <span class="nav-text">6.3 附加Append</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-分组"><span class="nav-number">8.</span> <span class="nav-text">7. 分组</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-重构Reshaping"><span class="nav-number">9.</span> <span class="nav-text">8. 重构Reshaping</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-堆Stack"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 堆Stack</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-透视表Pivot-Tables"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 透视表Pivot Tables</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-时间系列Time-Series"><span class="nav-number">10.</span> <span class="nav-text">9. 时间系列Time Series</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-分类"><span class="nav-number">11.</span> <span class="nav-text">10. 分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#11-画图Plotting"><span class="nav-number">12.</span> <span class="nav-text">11. 画图Plotting</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#12-数据存取"><span class="nav-number">13.</span> <span class="nav-text">12. 数据存取</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#13-参考文献"><span class="nav-number">14.</span> <span class="nav-text">13. 参考文献</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LeoBrilliant</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"LeoBrilliant"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
