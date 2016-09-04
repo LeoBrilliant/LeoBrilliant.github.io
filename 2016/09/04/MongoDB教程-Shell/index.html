@@ -1,0 +1,763 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="笔记,MongoDB,数据库," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="【摘要】MongoDB命令行使用指南。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="MongoDB教程 - Shell">
+<meta property="og:url" content="https://leobriliiant.github.io/2016/09/04/MongoDB教程-Shell/index.html">
+<meta property="og:site_name" content="IAMLEOBRILLIANT">
+<meta property="og:description" content="【摘要】MongoDB命令行使用指南。">
+<meta property="og:updated_time" content="2016-09-04T05:53:32.993Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="MongoDB教程 - Shell">
+<meta name="twitter:description" content="【摘要】MongoDB命令行使用指南。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://leobriliiant.github.io/2016/09/04/MongoDB教程-Shell/"/>
+
+  <title> MongoDB教程 - Shell | IAMLEOBRILLIANT </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IAMLEOBRILLIANT</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Run Forest! Run!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                MongoDB教程 - Shell
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2016-09-04T13:50:51+08:00" content="2016-09-04">
+              2016-09-04
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/09/04/MongoDB教程-Shell/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/04/MongoDB教程-Shell/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>【摘要】<br>MongoDB命令行使用指南。<br><a id="more"></a></p>
+<h1 id="1-MongoDB简介"><a href="#1-MongoDB简介" class="headerlink" title="1. MongoDB简介"></a>1. MongoDB简介</h1><p>MongoDB是一个具有高性能、高可用、自动扩展等特性的开源文档数据库，并且不需要使用ORM来提升开发效率。</p>
+<ul>
+<li>Documents<blockquote>
+<p>MongoDB中的一条记录称为文档(document)，是一种包含一系列域和值的数据结构，类似于JSON对象。</p>
+</blockquote>
+</li>
+<li>Collections<blockquote>
+<p>MongoDB将文档存储在集合(collections)中。集合与关系型数据库中的表有点像。但是集合不要求其中的文档具有相同的模式(schema)。</p>
+</blockquote>
+</li>
+</ul>
+<blockquote>
+<p>在MongoDB中，存储在一个集合中的文档必须使用唯一的_id字段来作为主键。</p>
+</blockquote>
+<h1 id="2-安装MongoDB"><a href="#2-安装MongoDB" class="headerlink" title="2. 安装MongoDB"></a>2. 安装MongoDB</h1><p>安装目标平台包含Linux、OS X、Windows，这里先看看Windows的安装过程。其他的OS应该类似。</p>
+<h2 id="2-1-在Windows上安装MongoDB社区版"><a href="#2-1-在Windows上安装MongoDB社区版" class="headerlink" title="2.1 在Windows上安装MongoDB社区版"></a>2.1 在Windows上安装MongoDB社区版</h2><ul>
+<li>在官方网站上下载.msi的安装包，注意选择版本。</li>
+<li>双击安装包，选择安装目录，假设是C:\mongodb。</li>
+</ul>
+<p>一路确定，默认配置即可安装成功。一般安装包已经包含以下组件：</p>
+<table>
+<thead>
+<tr>
+<th>组件集</th>
+<th>二进制文件</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务器</td>
+<td>mongod.exe</td>
+</tr>
+<tr>
+<td>路由器</td>
+<td>mongos.exe</td>
+</tr>
+<tr>
+<td>客户端</td>
+<td>mongo.exe</td>
+</tr>
+<tr>
+<td>监测工具</td>
+<td>mongostat.exe, mongotop.exe</td>
+</tr>
+<tr>
+<td>导入导出工具</td>
+<td>mongodump.exe, mongorestore.exe, mongoexport.exe, mongoimport.exe</td>
+</tr>
+<tr>
+<td>其他工具</td>
+<td>bsondump.exe, mongofiles.exe, mongoplog.exe, mongoperf.exe</td>
+</tr>
+</tbody>
+</table>
+<h1 id="3-运行MongoDB"><a href="#3-运行MongoDB" class="headerlink" title="3. 运行MongoDB"></a>3. 运行MongoDB</h1><h2 id="3-1-设置MongoDB运行环境"><a href="#3-1-设置MongoDB运行环境" class="headerlink" title="3.1 设置MongoDB运行环境"></a>3.1 设置MongoDB运行环境</h2><p>MongoDB需要指定存储数据的目录。如果没有就创建一个。假设数据存储在D:\test\mongodb\data<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$mkdir D:\test\mongodb\data</div></pre></td></tr></table></figure></p>
+<p>启动服务器时指定数据存储目录。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">$C:\mongodb\bin\mongod.exe --dbpath D:\test\mongodb\data</div><div class="line"># 如果路径中包含空格，使用双引号包围路径。</div><div class="line"></div><div class="line"># 在后台运行服务器</div><div class="line">$start /b mongod.exe --dbpath D:\test\mongodb\data</div></pre></td></tr></table></figure></p>
+<p>也可以在配置文件中指定dbpath配置项。不过这个配置项有点多。</p>
+<h2 id="3-2-启动服务器"><a href="#3-2-启动服务器" class="headerlink" title="3.2 启动服务器"></a>3.2 启动服务器</h2><p>参见上一条命令。</p>
+<h2 id="3-3-连接MongoDB"><a href="#3-3-连接MongoDB" class="headerlink" title="3.3 连接MongoDB"></a>3.3 连接MongoDB</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$C:\mongodb\bin\mongo.exe</div></pre></td></tr></table></figure>
+<h2 id="3-4-Shell帮助"><a href="#3-4-Shell帮助" class="headerlink" title="3.4 Shell帮助"></a>3.4 Shell帮助</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;help</div></pre></td></tr></table></figure>
+<h2 id="3-5-切换至test数据库"><a href="#3-5-切换至test数据库" class="headerlink" title="3.5 切换至test数据库"></a>3.5 切换至test数据库</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;use test</div></pre></td></tr></table></figure>
+<p>也可以将MongoDB作为Windows的服务，设置、启动、停止过程见官方文档。</p>
+<h1 id="4-导入样例数据集"><a href="#4-导入样例数据集" class="headerlink" title="4. 导入样例数据集"></a>4. 导入样例数据集</h1><ul>
+<li>下载数据集primer-dataset.json</li>
+<li>导入数据<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$mongoimport --db test --collection restaurants --drop --file ~/downloads/primer-dataset.json</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="4-插入数据"><a href="#4-插入数据" class="headerlink" title="4. 插入数据"></a>4. 插入数据</h1><p>使用insert进行插入，如果插入的集合不存在，系统自动创建该集合。</p>
+<h2 id="4-1-插入一条文档"><a href="#4-1-插入一条文档" class="headerlink" title="4.1 插入一条文档"></a>4.1 插入一条文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.insert(</div><div class="line">   &#123;</div><div class="line">      &quot;address&quot; : &#123;</div><div class="line">         &quot;street&quot; : &quot;2 Avenue&quot;,</div><div class="line">         &quot;zipcode&quot; : &quot;10075&quot;,</div><div class="line">         &quot;building&quot; : &quot;1480&quot;,</div><div class="line">         &quot;coord&quot; : [ -73.9557413, 40.7720266 ]</div><div class="line">      &#125;,</div><div class="line">      &quot;borough&quot; : &quot;Manhattan&quot;,</div><div class="line">      &quot;cuisine&quot; : &quot;Italian&quot;,</div><div class="line">      &quot;grades&quot; : [</div><div class="line">         &#123;</div><div class="line">            &quot;date&quot; : ISODate(&quot;2014-10-01T00:00:00Z&quot;),</div><div class="line">            &quot;grade&quot; : &quot;A&quot;,</div><div class="line">            &quot;score&quot; : 11</div><div class="line">         &#125;,</div><div class="line">         &#123;</div><div class="line">            &quot;date&quot; : ISODate(&quot;2014-01-16T00:00:00Z&quot;),</div><div class="line">            &quot;grade&quot; : &quot;B&quot;,</div><div class="line">            &quot;score&quot; : 17</div><div class="line">         &#125;</div><div class="line">      ],</div><div class="line">      &quot;name&quot; : &quot;Vella&quot;,</div><div class="line">      &quot;restaurant_id&quot; : &quot;41704620&quot;</div><div class="line">   &#125;</div><div class="line">)</div></pre></td></tr></table></figure>
+<p>insert()返回包含操作状态的WriteResult对象。如果传入insert方法的文档不包含_id字段，系统自动加入该字段并将其值设为生成的ObjectId。</p>
+<h1 id="5-查找或查询数据"><a href="#5-查找或查询数据" class="headerlink" title="5. 查找或查询数据"></a>5. 查找或查询数据</h1><p>可是使用find()方法查询MongoDB中集合的数据。所有MongoDB的查询作用域为同一个集合。</p>
+<p>查询可以返回集合中的所有文档或者符合特定过滤条件的文档，过滤条件可以作为参数传递给find()方法。</p>
+<p>find()方法将查询结果通过cursor返回。通过遍历cursor获得文档。</p>
+<h2 id="5-1-查询集合中的所有文档"><a href="#5-1-查询集合中的所有文档" class="headerlink" title="5.1 查询集合中的所有文档"></a>5.1 查询集合中的所有文档</h2><p>不传递过滤条件给find()<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find()</div></pre></td></tr></table></figure></p>
+<h2 id="5-2-指定相等的条件"><a href="#5-2-指定相等的条件" class="headerlink" title="5.2 指定相等的条件"></a>5.2 指定相等的条件</h2><p>如果过滤条件是等于，其形式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123; &lt;field1&gt;: &lt;value1&gt;, &lt;field2&gt;: &lt;value2&gt;, ...&#125;</div></pre></td></tr></table></figure></p>
+<p>如果条件中的字段是顶层字段，并且不是嵌入文档或者array，可以使用引号包围字段，也可以省略引号。</p>
+<p>如果是嵌入文档或者array，则要使用dot表示法，并且用引号包围字段。</p>
+<h3 id="5-2-1-查询顶层字段"><a href="#5-2-1-查询顶层字段" class="headerlink" title="5.2.1 查询顶层字段"></a>5.2.1 查询顶层字段</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123;&quot;borough&quot;: &quot;Manhattan&quot; &#125;)</div><div class="line">&gt;db.restaurants.find(&#123;borough: &quot;Manhattan&quot; &#125;)</div></pre></td></tr></table></figure>
+<h3 id="5-2-2-查询嵌入文档字段"><a href="#5-2-2-查询嵌入文档字段" class="headerlink" title="5.2.2 查询嵌入文档字段"></a>5.2.2 查询嵌入文档字段</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123;&quot;address.zipcode&quot;: &quot;10075&quot; &#125;)</div></pre></td></tr></table></figure>
+<h3 id="5-2-3-查询Array中的字段"><a href="#5-2-3-查询Array中的字段" class="headerlink" title="5.2.3 查询Array中的字段"></a>5.2.3 查询Array中的字段</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123;&quot;grades.grade&quot;: &quot;B&quot; &#125;)</div></pre></td></tr></table></figure>
+<h2 id="5-3-查询条件中指定运算符"><a href="#5-3-查询条件中指定运算符" class="headerlink" title="5.3 查询条件中指定运算符"></a>5.3 查询条件中指定运算符</h2><p>在MongoDB的查询条件中使用运算符，例如比较运算符，具有如下形式：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123; &lt;field1&gt;: &#123; &lt;operator1&gt;: &lt;value1&gt;&#125; &#125;</div></pre></td></tr></table></figure></p>
+<h3 id="5-3-1-大于运算符"><a href="#5-3-1-大于运算符" class="headerlink" title="5.3.1 大于运算符"></a>5.3.1 大于运算符</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123; &quot;grades.score&quot;: &#123; $gt: 30 &#125; &#125; )</div></pre></td></tr></table></figure>
+<h3 id="5-3-2-小于运算符"><a href="#5-3-2-小于运算符" class="headerlink" title="5.3.2 小于运算符"></a>5.3.2 小于运算符</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123; &quot;grades.score&quot;: &#123; $lt: 10 &#125; &#125; )</div></pre></td></tr></table></figure>
+<h3 id="5-3-3-常用比较运算符"><a href="#5-3-3-常用比较运算符" class="headerlink" title="5.3.3 常用比较运算符"></a>5.3.3 常用比较运算符</h3><p>$eq, $gt, $gte, $lt, $lte, $ne, $in, $nin</p>
+<h2 id="5-4-组合条件"><a href="#5-4-组合条件" class="headerlink" title="5.4 组合条件"></a>5.4 组合条件</h2><p>可以使用逻辑与(AND)和逻辑或(OR)来组合多重查询条件。</p>
+<h3 id="5-4-1-逻辑与"><a href="#5-4-1-逻辑与" class="headerlink" title="5.4.1 逻辑与"></a>5.4.1 逻辑与</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123; &quot;cuisine&quot;: &quot;Italian&quot;, &quot;address.zipcode&quot;: &quot;10075&quot; &#125;)</div></pre></td></tr></table></figure>
+<h3 id="5-4-2-逻辑或"><a href="#5-4-2-逻辑或" class="headerlink" title="5.4.2 逻辑或"></a>5.4.2 逻辑或</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find(&#123; $or: [&#123;&quot;cuisine&quot;: &quot;Italian&quot;&#125;, &#123;&quot;address.zipcode&quot;: &quot;10075&quot;&#125;] &#125;)</div></pre></td></tr></table></figure>
+<h2 id="5-5-查询结果排序"><a href="#5-5-查询结果排序" class="headerlink" title="5.5 查询结果排序"></a>5.5 查询结果排序</h2><p>将需要排序的字段及其排序方式传入查询结果的sort()方法，其中排序方式1为升序，-1位降序。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.find().sort( &#123; &quot;borough&quot;: 1, &quot;address.zipcode&quot;: 1 &#125;)</div></pre></td></tr></table></figure></p>
+<h1 id="6-更新数据"><a href="#6-更新数据" class="headerlink" title="6. 更新数据"></a>6. 更新数据</h1><p>使用update()方法来更新数据，参数包括过滤条件、更新后的文档、其他选项。其中过滤条件与查询的过滤条件语法相同。update()默认只更新一条文档，使用multi选项来更新所有符合条件的文档。_id字段不能更新。update()方法返回WriteObject。</p>
+<h2 id="6-1-更新特定字段"><a href="#6-1-更新特定字段" class="headerlink" title="6.1 更新特定字段"></a>6.1 更新特定字段</h2><p>MongoDB提供了许多更新运算符，比如$set，来更新一个字段的值。有些更新运算符，比如$set，会创建不存在的字段。</p>
+<h3 id="6-1-1-更新顶层字段"><a href="#6-1-1-更新顶层字段" class="headerlink" title="6.1.1 更新顶层字段"></a>6.1.1 更新顶层字段</h3><p>将名称为”Juni”的文档中，”cuisine”字段更新，”lastModified”字段更新为当前日期。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.update(</div><div class="line">    &#123;&quot;name&quot;: &quot;Juni&quot; &#125;,</div><div class="line">    &#123;</div><div class="line">        $set: &#123; &quot;cuisine&quot;: &quot;American (New)&quot;&#125;,</div><div class="line">        $currentDate: &#123;&quot;lastModified&quot;: true&#125;</div><div class="line">    &#125;</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<h3 id="6-1-2-更新嵌入字段"><a href="#6-1-2-更新嵌入字段" class="headerlink" title="6.1.2 更新嵌入字段"></a>6.1.2 更新嵌入字段</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.update(</div><div class="line">    &#123; &quot;restaurant_id&quot;: &quot;41156888&quot; &#125;,</div><div class="line">    &#123; $set: &#123; &quot;address.street&quot;: &quot;East 31st Street&quot; &#125; &#125;</div><div class="line">)</div></pre></td></tr></table></figure>
+<h3 id="6-1-3-更新多条文档"><a href="#6-1-3-更新多条文档" class="headerlink" title="6.1.3 更新多条文档"></a>6.1.3 更新多条文档</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.update(</div><div class="line">    &#123;&quot;address.zipcode&quot;: &quot;10016&quot;, cuisine: &quot;Other&quot;&#125;,</div><div class="line">    &#123;</div><div class="line">        $set: &#123; cuisine: &quot;Category To Be Determined&quot; &#125;,</div><div class="line">        $currentDate: &#123; &quot;lastModified&quot;: true&#125;</div><div class="line">    &#125;,</div><div class="line">    &#123; multi: true &#125;</div><div class="line">)</div></pre></td></tr></table></figure>
+<h2 id="6-2-替换文档"><a href="#6-2-替换文档" class="headerlink" title="6.2 替换文档"></a>6.2 替换文档</h2><p>如果要替换文档中除了_id的其他字段，只需将新文档作为update()方法的第二个参数。新文档可以含有与旧文档不同的字段。因为_id是不可变的，所以可以在替换时省略该字段，如果包含该字段，则必须与现有值相同。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div></pre></td><td class="code"><pre><div class="line">db.restaurants.update(</div><div class="line">   &#123; &quot;restaurant_id&quot; : &quot;41704620&quot; &#125;,</div><div class="line">   &#123;</div><div class="line">     &quot;name&quot; : &quot;Vella 2&quot;,</div><div class="line">     &quot;address&quot; : &#123;</div><div class="line">              &quot;coord&quot; : [ -73.9557413, 40.7720266 ],</div><div class="line">              &quot;building&quot; : &quot;1480&quot;,</div><div class="line">              &quot;street&quot; : &quot;2 Avenue&quot;,</div><div class="line">              &quot;zipcode&quot; : &quot;10075&quot;</div><div class="line">     &#125;</div><div class="line">   &#125;</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<h1 id="7-删除数据"><a href="#7-删除数据" class="headerlink" title="7. 删除数据"></a>7. 删除数据</h1><p>使用remove()方法来删除集合中的文档。可以将筛选条件传入方法，筛选条件的语法同查询条件。默认删除所有符合条件的文档。返回WriteObject。</p>
+<h2 id="7-1-删除符合条件的所有文档"><a href="#7-1-删除符合条件的所有文档" class="headerlink" title="7.1 删除符合条件的所有文档"></a>7.1 删除符合条件的所有文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.remove(</div><div class="line">    &#123; &quot;borough&quot;: &quot;Manhattan&quot; &#125;</div><div class="line">)</div></pre></td></tr></table></figure>
+<h2 id="7-2-删除符合条件的一条文档"><a href="#7-2-删除符合条件的一条文档" class="headerlink" title="7.2 删除符合条件的一条文档"></a>7.2 删除符合条件的一条文档</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.remove(</div><div class="line">    &#123; &quot;borough&quot;: &quot;Queen&quot; &#125;</div><div class="line">    &#123; justOne: true &#125;</div><div class="line">)</div></pre></td></tr></table></figure>
+<h2 id="7-3-删除所有文档"><a href="#7-3-删除所有文档" class="headerlink" title="7.3 删除所有文档"></a>7.3 删除所有文档</h2><p>传入空条件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.remove(</div><div class="line">    &#123; &#125;</div><div class="line">)</div></pre></td></tr></table></figure></p>
+<h2 id="7-4-删除一个集合"><a href="#7-4-删除一个集合" class="headerlink" title="7.4 删除一个集合"></a>7.4 删除一个集合</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.drop()</div></pre></td></tr></table></figure>
+<p>成功返回true，如果集合不存在，返回false。</p>
+<h1 id="8-数据聚合"><a href="#8-数据聚合" class="headerlink" title="8. 数据聚合"></a>8. 数据聚合</h1><p>MongoDB支持数据聚合操作，比如按特定的键分组并且计算每组的总和或计数。<br>使用aggregate()方法进行staged-based聚合。</p>
+<h2 id="8-1-对文档按字段分组然后计数"><a href="#8-1-对文档按字段分组然后计数" class="headerlink" title="8.1 对文档按字段分组然后计数"></a>8.1 对文档按字段分组然后计数</h2><p>使用$group stage来按特定的键分组，将需要分组的字段列在”_id”字段中，各分组字段需要加入”$”前缀。分组后，可以使用accumulators进行计算。</p>
+<p>下例演示对restaurants集合按borough字段分组，然后使用$sum accumulator为每个分组计数。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.aggregate(</div><div class="line">    [</div><div class="line">        &#123; $group: &#123; &quot;_id&quot;: &quot;$borough&quot;, &quot;count&quot;: &#123; $sum: 1 &#125; &#125; &#125;</div><div class="line">    ]</div><div class="line">);</div></pre></td></tr></table></figure></p>
+<h2 id="8-2-过滤再分组"><a href="#8-2-过滤再分组" class="headerlink" title="8.2 过滤再分组"></a>8.2 过滤再分组</h2><p>使用$match stage过滤文档，过滤条件语法同查询条件。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.aggregate(</div><div class="line">    [</div><div class="line">        &#123; $match: &#123;&quot;borough&quot;: &quot;Queens&quot;, &quot;cuisine&quot;: &quot;Brazilian&quot; &#125; &#125;,</div><div class="line">        &#123; $group: &#123; &quot;_id&quot;: &quot;$address.zipcode&quot;, &quot;count&quot;: &#123; $sum: 1 &#125; &#125; &#125;</div><div class="line">    ]</div><div class="line">);</div></pre></td></tr></table></figure></p>
+<h1 id="9-索引"><a href="#9-索引" class="headerlink" title="9 索引"></a>9 索引</h1><p>索引可以加快查询速度，减少扫描文档的数量。</p>
+<p>使用createIndex()方法创建索引。系统自动为_id字段创建了一个索引。将需要创建索引的字段及其排序方式传入createIndex()，形式如下：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&#123; &lt;field1&gt;: &lt;type1&gt;, ... &#125;</div></pre></td></tr></table></figure></p>
+<p>其中type为排序方式，1为升序，-1为降序。</p>
+<h2 id="9-1-创建单字段索引"><a href="#9-1-创建单字段索引" class="headerlink" title="9.1 创建单字段索引"></a>9.1 创建单字段索引</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.createIndex( &#123; &quot;cuisine&quot;: 1 &#125; )</div></pre></td></tr></table></figure>
+<h2 id="9-2-创建复合索引"><a href="#9-2-创建复合索引" class="headerlink" title="9.2 创建复合索引"></a>9.2 创建复合索引</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">&gt;db.restaurants.createIndex( &#123; &quot;cuisine&quot;: 1, &quot;address.zipcode&quot;: -1 &#125; )</div></pre></td></tr></table></figure>
+<h1 id="10-参考文献"><a href="#10-参考文献" class="headerlink" title="10. 参考文献"></a>10. 参考文献</h1><p>[1] <a href="https://docs.mongodb.com/getting-started/shell/" target="_blank" rel="external">https://docs.mongodb.com/getting-started/shell/</a></p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/笔记/" rel="tag">#笔记</a>
+          
+            <a href="/tags/MongoDB/" rel="tag">#MongoDB</a>
+          
+            <a href="/tags/数据库/" rel="tag">#数据库</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/08/31/10分钟快速了解Pandas/" rel="next" title="10分钟快速了解Pandas">
+                <i class="fa fa-chevron-left"></i> 10分钟快速了解Pandas
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/09/04/MongoDB教程-Shell/"
+           data-title="MongoDB教程 - Shell" data-url="https://leobriliiant.github.io/2016/09/04/MongoDB教程-Shell/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/LeoBrilliant.png"
+               alt="LeoBrilliant" />
+          <p class="site-author-name" itemprop="name">LeoBrilliant</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">11</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-MongoDB简介"><span class="nav-number">1.</span> <span class="nav-text">1. MongoDB简介</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-安装MongoDB"><span class="nav-number">2.</span> <span class="nav-text">2. 安装MongoDB</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-在Windows上安装MongoDB社区版"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 在Windows上安装MongoDB社区版</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-运行MongoDB"><span class="nav-number">3.</span> <span class="nav-text">3. 运行MongoDB</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#3-1-设置MongoDB运行环境"><span class="nav-number">3.1.</span> <span class="nav-text">3.1 设置MongoDB运行环境</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-2-启动服务器"><span class="nav-number">3.2.</span> <span class="nav-text">3.2 启动服务器</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-3-连接MongoDB"><span class="nav-number">3.3.</span> <span class="nav-text">3.3 连接MongoDB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-4-Shell帮助"><span class="nav-number">3.4.</span> <span class="nav-text">3.4 Shell帮助</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-5-切换至test数据库"><span class="nav-number">3.5.</span> <span class="nav-text">3.5 切换至test数据库</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-导入样例数据集"><span class="nav-number">4.</span> <span class="nav-text">4. 导入样例数据集</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-插入数据"><span class="nav-number">5.</span> <span class="nav-text">4. 插入数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-插入一条文档"><span class="nav-number">5.1.</span> <span class="nav-text">4.1 插入一条文档</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#5-查找或查询数据"><span class="nav-number">6.</span> <span class="nav-text">5. 查找或查询数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#5-1-查询集合中的所有文档"><span class="nav-number">6.1.</span> <span class="nav-text">5.1 查询集合中的所有文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-2-指定相等的条件"><span class="nav-number">6.2.</span> <span class="nav-text">5.2 指定相等的条件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-1-查询顶层字段"><span class="nav-number">6.2.1.</span> <span class="nav-text">5.2.1 查询顶层字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-2-查询嵌入文档字段"><span class="nav-number">6.2.2.</span> <span class="nav-text">5.2.2 查询嵌入文档字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2-3-查询Array中的字段"><span class="nav-number">6.2.3.</span> <span class="nav-text">5.2.3 查询Array中的字段</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-3-查询条件中指定运算符"><span class="nav-number">6.3.</span> <span class="nav-text">5.3 查询条件中指定运算符</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-1-大于运算符"><span class="nav-number">6.3.1.</span> <span class="nav-text">5.3.1 大于运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-2-小于运算符"><span class="nav-number">6.3.2.</span> <span class="nav-text">5.3.2 小于运算符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-3-3-常用比较运算符"><span class="nav-number">6.3.3.</span> <span class="nav-text">5.3.3 常用比较运算符</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-4-组合条件"><span class="nav-number">6.4.</span> <span class="nav-text">5.4 组合条件</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-1-逻辑与"><span class="nav-number">6.4.1.</span> <span class="nav-text">5.4.1 逻辑与</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-4-2-逻辑或"><span class="nav-number">6.4.2.</span> <span class="nav-text">5.4.2 逻辑或</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-5-查询结果排序"><span class="nav-number">6.5.</span> <span class="nav-text">5.5 查询结果排序</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#6-更新数据"><span class="nav-number">7.</span> <span class="nav-text">6. 更新数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#6-1-更新特定字段"><span class="nav-number">7.1.</span> <span class="nav-text">6.1 更新特定字段</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-1-更新顶层字段"><span class="nav-number">7.1.1.</span> <span class="nav-text">6.1.1 更新顶层字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-2-更新嵌入字段"><span class="nav-number">7.1.2.</span> <span class="nav-text">6.1.2 更新嵌入字段</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-1-3-更新多条文档"><span class="nav-number">7.1.3.</span> <span class="nav-text">6.1.3 更新多条文档</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#6-2-替换文档"><span class="nav-number">7.2.</span> <span class="nav-text">6.2 替换文档</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#7-删除数据"><span class="nav-number">8.</span> <span class="nav-text">7. 删除数据</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#7-1-删除符合条件的所有文档"><span class="nav-number">8.1.</span> <span class="nav-text">7.1 删除符合条件的所有文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-2-删除符合条件的一条文档"><span class="nav-number">8.2.</span> <span class="nav-text">7.2 删除符合条件的一条文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-3-删除所有文档"><span class="nav-number">8.3.</span> <span class="nav-text">7.3 删除所有文档</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#7-4-删除一个集合"><span class="nav-number">8.4.</span> <span class="nav-text">7.4 删除一个集合</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#8-数据聚合"><span class="nav-number">9.</span> <span class="nav-text">8. 数据聚合</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#8-1-对文档按字段分组然后计数"><span class="nav-number">9.1.</span> <span class="nav-text">8.1 对文档按字段分组然后计数</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#8-2-过滤再分组"><span class="nav-number">9.2.</span> <span class="nav-text">8.2 过滤再分组</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#9-索引"><span class="nav-number">10.</span> <span class="nav-text">9 索引</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#9-1-创建单字段索引"><span class="nav-number">10.1.</span> <span class="nav-text">9.1 创建单字段索引</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#9-2-创建复合索引"><span class="nav-number">10.2.</span> <span class="nav-text">9.2 创建复合索引</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#10-参考文献"><span class="nav-number">11.</span> <span class="nav-text">10. 参考文献</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LeoBrilliant</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"LeoBrilliant"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
