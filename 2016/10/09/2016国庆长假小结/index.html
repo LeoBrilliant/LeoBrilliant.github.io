@@ -68,7 +68,7 @@
 <link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="Pandas,笔记,MongoDB,Jupyter," />
+  <meta name="keywords" content="小结,假期," />
 
 
 
@@ -84,18 +84,16 @@
 
 
 
-<meta name="description" content="【摘要】尝试从MongoDB中查询数据，然后生成Pandas DataFrame，数据结果以图形化展示。">
+<meta name="description" content="转眼国庆长假就这么结束。在公寓里宅了九天，有啥收获呢？">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Pandas and MongoDB">
-<meta property="og:url" content="https://leobriliiant.github.io/2016/09/04/Pandas-and-MongoDB/index.html">
+<meta property="og:title" content="2016国庆长假小结">
+<meta property="og:url" content="https://leobriliiant.github.io/2016/10/09/2016国庆长假小结/index.html">
 <meta property="og:site_name" content="IAMLEOBRILLIANT">
-<meta property="og:description" content="【摘要】尝试从MongoDB中查询数据，然后生成Pandas DataFrame，数据结果以图形化展示。">
-<meta property="og:image" content="https://leobriliiant.github.io/img/output_12_1.png">
-<meta property="og:updated_time" content="2016-09-04T10:52:54.739Z">
+<meta property="og:description" content="转眼国庆长假就这么结束。在公寓里宅了九天，有啥收获呢？">
+<meta property="og:updated_time" content="2016-10-09T14:27:07.832Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Pandas and MongoDB">
-<meta name="twitter:description" content="【摘要】尝试从MongoDB中查询数据，然后生成Pandas DataFrame，数据结果以图形化展示。">
-<meta name="twitter:image" content="https://leobriliiant.github.io/img/output_12_1.png">
+<meta name="twitter:title" content="2016国庆长假小结">
+<meta name="twitter:description" content="转眼国庆长假就这么结束。在公寓里宅了九天，有啥收获呢？">
 
 
 
@@ -116,9 +114,9 @@
 
 
 
-  <link rel="canonical" href="https://leobriliiant.github.io/2016/09/04/Pandas-and-MongoDB/"/>
+  <link rel="canonical" href="https://leobriliiant.github.io/2016/10/09/2016国庆长假小结/"/>
 
-  <title> Pandas and MongoDB | IAMLEOBRILLIANT </title>
+  <title> 2016国庆长假小结 | IAMLEOBRILLIANT </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -248,7 +246,7 @@
             
             
               
-                Pandas and MongoDB
+                2016国庆长假小结
               
             
           </h1>
@@ -260,8 +258,8 @@
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time itemprop="dateCreated" datetime="2016-09-04T18:37:13+08:00" content="2016-09-04">
-              2016-09-04
+            <time itemprop="dateCreated" datetime="2016-10-09T22:20:55+08:00" content="2016-10-09">
+              2016-10-09
             </time>
           </span>
 
@@ -274,8 +272,8 @@
               <span class="post-meta-item-text">分类于</span>
               
                 <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
-                  <a href="/categories/技术/" itemprop="url" rel="index">
-                    <span itemprop="name">技术</span>
+                  <a href="/categories/生活/" itemprop="url" rel="index">
+                    <span itemprop="name">生活</span>
                   </a>
                 </span>
 
@@ -290,8 +288,8 @@
             
               <span class="post-comments-count">
                 &nbsp; | &nbsp;
-                <a href="/2016/09/04/Pandas-and-MongoDB/#comments" itemprop="discussionUrl">
-                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/09/04/Pandas-and-MongoDB/" itemprop="commentsCount"></span>
+                <a href="/2016/10/09/2016国庆长假小结/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/10/09/2016国庆长假小结/" itemprop="commentsCount"></span>
                 </a>
               </span>
             
@@ -314,53 +312,38 @@
       
 
       
-        <p>【摘要】<br>尝试从MongoDB中查询数据，然后生成Pandas DataFrame，数据结果以图形化展示。<br><a id="more"></a></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div></pre></td><td class="code"><pre><div class="line">%matplotlib inline</div><div class="line"><span class="keyword">from</span> pymongo <span class="keyword">import</span> MongoClient</div><div class="line"><span class="keyword">import</span> pandas <span class="keyword">as</span> pd</div><div class="line"><span class="keyword">import</span> matplotlib <span class="keyword">as</span> plt</div></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">client = MongoClient()</div><div class="line">db = client.test</div></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cursor = db.restaurants.find()</div></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cursor.count()</div></pre></td></tr></table></figure>
-<pre><code>15103
-</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">l = list(cursor)</div></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">len(l)</div></pre></td></tr></table></figure>
-<pre><code>15103
-</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">l[<span class="number">0</span>]</div></pre></td></tr></table></figure>
-<pre><code>{u&apos;_id&apos;: ObjectId(&apos;57cb93fe73fcad0a93f13afc&apos;),
- u&apos;address&apos;: {u&apos;building&apos;: u&apos;469&apos;,
-  u&apos;coord&apos;: [-73.961704, 40.662942],
-  u&apos;street&apos;: u&apos;Flatbush Avenue&apos;,
-  u&apos;zipcode&apos;: u&apos;11225&apos;},
- u&apos;borough&apos;: u&apos;Brooklyn&apos;,
- u&apos;cuisine&apos;: u&apos;Hamburgers&apos;,
- u&apos;grades&apos;: [{u&apos;date&apos;: datetime.datetime(2014, 12, 30, 0, 0),
-   u&apos;grade&apos;: u&apos;A&apos;,
-   u&apos;score&apos;: 8},
-  {u&apos;date&apos;: datetime.datetime(2014, 7, 1, 0, 0), u&apos;grade&apos;: u&apos;B&apos;, u&apos;score&apos;: 23},
-  {u&apos;date&apos;: datetime.datetime(2013, 4, 30, 0, 0),
-   u&apos;grade&apos;: u&apos;A&apos;,
-   u&apos;score&apos;: 12},
-  {u&apos;date&apos;: datetime.datetime(2012, 5, 8, 0, 0),
-   u&apos;grade&apos;: u&apos;A&apos;,
-   u&apos;score&apos;: 12}],
- u&apos;name&apos;: u&quot;Wendy&apos;S&quot;,
- u&apos;restaurant_id&apos;: u&apos;30112340&apos;}
-</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div></pre></td><td class="code"><pre><div class="line"><span class="comment"># 单分组且计数</span></div><div class="line">cursor = db.restaurants.aggregate(</div><div class="line">    [</div><div class="line">        &#123;<span class="string">"$group"</span>: &#123;<span class="string">"_id"</span>: <span class="string">"$borough"</span>, <span class="string">"count"</span>: &#123;<span class="string">"$sum"</span>: <span class="number">1</span>&#125;&#125;&#125;</div><div class="line">    ]</div><div class="line">)</div></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">cursor</div></pre></td></tr></table></figure>
-<pre><code>&lt;pymongo.command_cursor.CommandCursor at 0x11e395f8&gt;
-</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">list(cursor)</div></pre></td></tr></table></figure>
-<pre><code>[{u&apos;_id&apos;: u&apos;Missing&apos;, u&apos;count&apos;: 51},
- {u&apos;_id&apos;: u&apos;Queens&apos;, u&apos;count&apos;: 5656},
- {u&apos;_id&apos;: u&apos;Bronx&apos;, u&apos;count&apos;: 2338},
- {u&apos;_id&apos;: u&apos;Brooklyn&apos;, u&apos;count&apos;: 6085},
- {u&apos;_id&apos;: u&apos;Staten Island&apos;, u&apos;count&apos;: 969},
- {u&apos;_id&apos;: None, u&apos;count&apos;: 4}]
-</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df = pd.DataFrame(list(cursor)).set_index(<span class="string">"_id"</span>)</div></pre></td></tr></table></figure>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.plot(kind=<span class="string">'bar'</span>)</div></pre></td></tr></table></figure>
-<p><img src="/img/output_12_1.png" alt="png"></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">df.index.name = <span class="string">"Hello"</span></div></pre></td></tr></table></figure>
-<h1 id="实验结论"><a href="#实验结论" class="headerlink" title="实验结论"></a>实验结论</h1><h2 id="cursor遍历之后就不在有效，需要重新生成"><a href="#cursor遍历之后就不在有效，需要重新生成" class="headerlink" title="cursor遍历之后就不在有效，需要重新生成"></a>cursor遍历之后就不在有效，需要重新生成</h2><h2 id="DataFrame生成之后，可以用set-index将已有的列设置为index"><a href="#DataFrame生成之后，可以用set-index将已有的列设置为index" class="headerlink" title="DataFrame生成之后，可以用set_index将已有的列设置为index"></a>DataFrame生成之后，可以用set_index将已有的列设置为index</h2><h2 id="DataFrame的构造函数对原始数据有一定要求，需要能转换成Table结构。从MongoDB数据库中查询出来的游标，如果包含Array或嵌入文档，DataFrame将构造失败"><a href="#DataFrame的构造函数对原始数据有一定要求，需要能转换成Table结构。从MongoDB数据库中查询出来的游标，如果包含Array或嵌入文档，DataFrame将构造失败" class="headerlink" title="DataFrame的构造函数对原始数据有一定要求，需要能转换成Table结构。从MongoDB数据库中查询出来的游标，如果包含Array或嵌入文档，DataFrame将构造失败"></a>DataFrame的构造函数对原始数据有一定要求，需要能转换成Table结构。从MongoDB数据库中查询出来的游标，如果包含Array或嵌入文档，DataFrame将构造失败</h2><h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
-<li><a href="http://stackoverflow.com/questions/16249736/how-to-import-data-from-mongodb-to-pandas" target="_blank" rel="external">http://stackoverflow.com/questions/16249736/how-to-import-data-from-mongodb-to-pandas</a></li>
-<li><a href="http://stackoverflow.com/questions/24963062/a-better-way-to-load-mongodb-data-to-a-dataframe-using-pandas-and-pymongo" target="_blank" rel="external">http://stackoverflow.com/questions/24963062/a-better-way-to-load-mongodb-data-to-a-dataframe-using-pandas-and-pymongo</a></li>
+        <p>转眼国庆长假就这么结束。在公寓里宅了九天，有啥收获呢？<br><a id="more"></a></p>
+<h1 id="1-计算机"><a href="#1-计算机" class="headerlink" title="1. 计算机"></a>1. 计算机</h1><p>头两天在去公司看了两天《深入理解Nginx》，后面因为公司打扫地毯，就在公寓里刷LeetCode，从3道刷到21道，速度是有点慢哈。但是现在编码的能力有点恢复了。后面提高速度。</p>
+<h1 id="2-读书"><a href="#2-读书" class="headerlink" title="2. 读书"></a>2. 读书</h1><h2 id="2-1-《笑场》"><a href="#2-1-《笑场》" class="headerlink" title="2.1 《笑场》"></a>2.1 《笑场》</h2><p>忘记之前看完了没，打开一看是74%的进度，用一天晚上看完了。</p>
+<h2 id="2-2-《设计师要懂心理学》"><a href="#2-2-《设计师要懂心理学》" class="headerlink" title="2.2 《设计师要懂心理学》"></a>2.2 《设计师要懂心理学》</h2><p>之前看了一点，现在刷到100%。里面讲的东西还是挺好玩的，有些结论自己已经发现。需要抽点时间整理下笔记。</p>
+<h2 id="2-3-《24个比利》"><a href="#2-3-《24个比利》" class="headerlink" title="2.3 《24个比利》"></a>2.3 《24个比利》</h2><p>小说，看了大概6%。讲一个哥们集合了24中人格，真牛。</p>
+<h1 id="3-生活"><a href="#3-生活" class="headerlink" title="3. 生活"></a>3. 生活</h1><p>参加了蔡奕霖的婚礼，和几个战友聚了聚。和董飞一起在西贝搓了一顿，聊了聊近况，他请。还请杨洋吃了一顿饭，瘦了不少，加分。</p>
+<p>还在公寓的篮球场活动了一把，时隔近一年，我飘逸的跳投再次让人赞叹。等我的膝盖完全好了，我又是小飞侠。</p>
+<p>大学入学时购买的生活用品套装，假期里把褥子和被子扔了。因为长时间不用，一股霉味。搬了好几次家，这东西很占地方。下次就该扔书了，这玩意太重，而且好多不看的。</p>
+<h1 id="4-感情-amp-经验"><a href="#4-感情-amp-经验" class="headerlink" title="4. 感情&amp;经验"></a>4. 感情&amp;经验</h1><p>这应该是长假收获经验最多的地方了。虽然注册了没多久，但是也见识了不少人，有刚加微信就要红包的，有加了QQ之后就说别的男人不靠谱你能不能帮我渡过难关的，有混关系然后说要投资blabla的。当然了，也怪自己作，经验也不够。但是作为一名智商不低、逻辑思维能力不错、戒备心理不弱的帅哥，把近期的经验教训总结如下，以免上当受骗人财两空。</p>
+<h2 id="4-1-高危疑点"><a href="#4-1-高危疑点" class="headerlink" title="4.1 高危疑点"></a>4.1 高危疑点</h2><ul>
+<li>名称或自我介绍中包含微信号的，明显是别有目的。</li>
+<li>发消息比较频繁，并且都是系统模板。</li>
+<li>没聊几句有把联系方式发过来，并且带有挑逗语气的。</li>
 </ul>
+<h2 id="4-2-中危疑点"><a href="#4-2-中危疑点" class="headerlink" title="4.2 中危疑点"></a>4.2 中危疑点</h2><ul>
+<li>照片比较少，甚至只有一张图片，图片中遮挡面部的，比如戴墨镜。</li>
+<li>资料不全，并且大部分为空或者意义模糊的。</li>
+<li>加上微信后，发现朋友圈开通时间较短，图片不包含本人照片。</li>
+</ul>
+<h2 id="4-3-可疑点"><a href="#4-3-可疑点" class="headerlink" title="4.3 可疑点"></a>4.3 可疑点</h2><ul>
+<li>高收入，比如月收入50K以上。</li>
+<li>自营企业，比如开美容院、投资、开服装店。</li>
+<li>出现时间比较诡异，比如固定的时间出现，但在某个时间点莫名消失。</li>
+<li>宣扬自己家境好。</li>
+<li>约会约不出来。</li>
+</ul>
+<h2 id="4-4-增加可信度的点"><a href="#4-4-增加可信度的点" class="headerlink" title="4.4 增加可信度的点"></a>4.4 增加可信度的点</h2><ul>
+<li>自己写的个人说明，里面还会小抒情，越详细就越接近真诚。</li>
+<li>个人照片较多，并且是正面露脸。</li>
+<li>微信朋友圈非近期开通，多是个人生活剪影，或者是行业相关的分享。</li>
+</ul>
+<p>下午，抽了点时间，按照上面的分类，重新看了下之前给我发信的人，对可疑的、不感兴趣的都发了拒信，也算有始有终。明天开始苦逼上班狗的生活。</p>
 
       
     </div>
@@ -383,13 +366,9 @@
       
         <div class="post-tags">
           
-            <a href="/tags/Pandas/" rel="tag">#Pandas</a>
+            <a href="/tags/小结/" rel="tag">#小结</a>
           
-            <a href="/tags/笔记/" rel="tag">#笔记</a>
-          
-            <a href="/tags/MongoDB/" rel="tag">#MongoDB</a>
-          
-            <a href="/tags/Jupyter/" rel="tag">#Jupyter</a>
+            <a href="/tags/假期/" rel="tag">#假期</a>
           
         </div>
       
@@ -398,17 +377,13 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2016/09/04/MongoDB教程-Shell/" rel="next" title="MongoDB教程 - Shell">
-                <i class="fa fa-chevron-left"></i> MongoDB教程 - Shell
+              <a href="/2016/10/03/SelfIntroduction/" rel="next" title="自我介绍">
+                <i class="fa fa-chevron-left"></i> 自我介绍
               </a>
             
           </div>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2016/09/13/sizeof小练习/" rel="prev" title="sizeof小练习">
-                sizeof小练习 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -440,8 +415,8 @@
           
   <div class="comments" id="comments">
     
-      <div class="ds-thread" data-thread-key="2016/09/04/Pandas-and-MongoDB/"
-           data-title="Pandas and MongoDB" data-url="https://leobriliiant.github.io/2016/09/04/Pandas-and-MongoDB/">
+      <div class="ds-thread" data-thread-key="2016/10/09/2016国庆长假小结/"
+           data-title="2016国庆长假小结" data-url="https://leobriliiant.github.io/2016/10/09/2016国庆长假小结/">
       </div>
     
   </div>
@@ -552,7 +527,7 @@
               
             
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#实验结论"><span class="nav-number">1.</span> <span class="nav-text">实验结论</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#cursor遍历之后就不在有效，需要重新生成"><span class="nav-number">1.1.</span> <span class="nav-text">cursor遍历之后就不在有效，需要重新生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataFrame生成之后，可以用set-index将已有的列设置为index"><span class="nav-number">1.2.</span> <span class="nav-text">DataFrame生成之后，可以用set_index将已有的列设置为index</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#DataFrame的构造函数对原始数据有一定要求，需要能转换成Table结构。从MongoDB数据库中查询出来的游标，如果包含Array或嵌入文档，DataFrame将构造失败"><span class="nav-number">1.3.</span> <span class="nav-text">DataFrame的构造函数对原始数据有一定要求，需要能转换成Table结构。从MongoDB数据库中查询出来的游标，如果包含Array或嵌入文档，DataFrame将构造失败</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">2.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#1-计算机"><span class="nav-number">1.</span> <span class="nav-text">1. 计算机</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#2-读书"><span class="nav-number">2.</span> <span class="nav-text">2. 读书</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-《笑场》"><span class="nav-number">2.1.</span> <span class="nav-text">2.1 《笑场》</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-《设计师要懂心理学》"><span class="nav-number">2.2.</span> <span class="nav-text">2.2 《设计师要懂心理学》</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-《24个比利》"><span class="nav-number">2.3.</span> <span class="nav-text">2.3 《24个比利》</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#3-生活"><span class="nav-number">3.</span> <span class="nav-text">3. 生活</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#4-感情-amp-经验"><span class="nav-number">4.</span> <span class="nav-text">4. 感情&经验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#4-1-高危疑点"><span class="nav-number">4.1.</span> <span class="nav-text">4.1 高危疑点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-2-中危疑点"><span class="nav-number">4.2.</span> <span class="nav-text">4.2 中危疑点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-3-可疑点"><span class="nav-number">4.3.</span> <span class="nav-text">4.3 可疑点</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-4-增加可信度的点"><span class="nav-number">4.4.</span> <span class="nav-text">4.4 增加可信度的点</span></a></li></ol></li></ol></div>
             
           </div>
         </section>
