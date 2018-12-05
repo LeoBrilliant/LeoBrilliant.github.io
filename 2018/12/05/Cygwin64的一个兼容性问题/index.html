@@ -1,0 +1,689 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/vendors/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/vendors/font-awesome/css/font-awesome.min.css?v=4.4.0" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.0.1" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="C++,Cygwin64,Boost,Network," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.0.1" />
+
+
+
+
+
+
+<meta name="description" content="Cygwin64名义上可以编译64位程序，但是底层应该还是32位的。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cygwin64的一个兼容性问题">
+<meta property="og:url" content="https://leobriliiant.github.io/2018/12/05/Cygwin64的一个兼容性问题/index.html">
+<meta property="og:site_name" content="IAMLEOBRILLIANT">
+<meta property="og:description" content="Cygwin64名义上可以编译64位程序，但是底层应该还是32位的。">
+<meta property="og:updated_time" content="2018-12-05T16:19:20.075Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Cygwin64的一个兼容性问题">
+<meta name="twitter:description" content="Cygwin64名义上可以编译64位程序，但是底层应该还是32位的。">
+
+
+
+<script type="text/javascript" id="hexo.configuration">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: 0,
+      author: '博主'
+    }
+  };
+</script>
+
+
+
+
+  <link rel="canonical" href="https://leobriliiant.github.io/2018/12/05/Cygwin64的一个兼容性问题/"/>
+
+  <title> Cygwin64的一个兼容性问题 | IAMLEOBRILLIANT </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">IAMLEOBRILLIANT</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle">Run Forest! Run!</p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                Cygwin64的一个兼容性问题
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time itemprop="dateCreated" datetime="2018-12-05T22:53:15+08:00" content="2018-12-05">
+              2018-12-05
+            </time>
+          </span>
+
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="https://schema.org/Thing">
+                  <a href="/categories/技术/" itemprop="url" rel="index">
+                    <span itemprop="name">技术</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2018/12/05/Cygwin64的一个兼容性问题/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2018/12/05/Cygwin64的一个兼容性问题/" itemprop="commentsCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>Cygwin64名义上可以编译64位程序，但是底层应该还是32位的。<br><a id="more"></a></p>
+<p>上一次更新博客，已经是两年多。这期间发生了很多事情，单纯从技术上讲，进步还是非常明显的。回归博客，一方面是防止遗忘，另一方面是恢复自信。</p>
+<p>言归正传，事情的起因是我合并了分布在两台电脑上的代码，一台是Windows 10，编程环境是Cygwin64，另一台是Ubuntu 14.04。这两台电脑上的代码，都有一个共同的祖先，后来分别加了一些可以对应的环境运行的代码。为了统一管理，现在要合并。于是乎，我在Cygwin64上执行了git pull。当然会有冲突啦，好在不多，手工解决也是可以接受的，只是Eclipse的git merge工具还是挺原始的，好比在现代社会还用石斧砍树。冲突都解决之后，再次编译，问题来了。问题主要是：</p>
+<ul>
+<li>/usr/local/include/boost/asio/detail/impl/win_iocp_io_service.ipp:350:63: error: cannot convert ‘long int<em>‘ to ‘volatile int</em>‘ for argument ‘1’ to ‘int _InterlockedCompareExchange(volatile int*, int, int)’</li>
+<li>/usr/local/include/boost/asio/detail/impl/socket_ops.ipp:1711:55: error: cannot convert ‘boost::asio::detail::ioctl_arg_type<em> {aka long unsigned int</em>}’ to ‘<strong>ms_u_long<em> {aka unsigned int</em>}’ for argument ‘3’ to ‘int ioctlsocket(SOCKET, int, </strong>ms_u_long*)’</li>
+<li>/usr/local/include/boost/asio/detail/impl/socket_ops.ipp:1807:65: error: cannot convert ‘timeval<em>‘ to ‘PTIMEVAL {aka __ms_timeval</em>}’ for argument ‘5’ to ‘int select(int, fd_set<em>, fd_set</em>, fd_set*, PTIMEVAL)’</li>
+<li>undefined reference to log4cplusxxx。</li>
+<li>relocation truncated to fit: r_x86_64_pc32 against undefined symbol。</li>
+</ul>
+<p>然后说说出问题的代码。首先是Boost Asio，如其名，Boost的异步IO库，主攻网络的；其次是log4cplus，是一个CPP的日志框架，两年前，轻狂无知，想给自己写的“交易系统”找一个可移植性比较强的日志框架，比来比去选的它，现在留下来的印象一好一坏，日志内容可定制面容姣好，编译部署难度超高体态臃肿（之前有一篇博客讲过它，用VS编译的过程只能用不堪回首来形容）。现在回过头来看，log4cplus支持向网络上写日志，又是网络，更加确认是Cygwin底层的问题。</p>
+<p>接下来说说解决问题的过程。遇到问题，首先就是求助于搜索引擎。Baidu专注在竞价排名停滞不前已经好些年，好在有办法连上世界上最好用的搜索引擎。对于前三个问题，网上的答案无非是编译时加入 -D<strong>USE_W32_SOCKETS，指定WINNT的版本。错误确实少了一些，但是种类并没有减少。只好去Boost Asio的官网上去看。他上面说，这个库在Win32上支持Cygwin。当时没太理解。不过大概的方向还是在编译器的位数上。所以不停的折腾Cygwin64中的GCC，删掉已经装好的mingw64，装gcc core，重新装Cygwin64，甚至考虑了msys2，来来回回，连着两个晚上都搞到快凌晨一点，还是编不过。然后我把编不过代码放到之前安装的Cygwin32上，编译参数输好之后，程序竟然可以正常运行。竟然是这样。。。现在知道这个D</strong>USE_W32_SOCKETS和Win32究竟是什么意思了，就是即便你在64位的操作系统上，即便你在Cygwin64上，如果要进行网络编程，还是乖乖切回到Cygwin32上。因为Cygwin实际是在Windows中模拟POSIX接口，底层实现还是WinAPI。如果最初的开发者采用的是32位网络API，而后续没有人去修改，那么现在也只能用32位网络API，这难道是传说中的路径依赖？<br>这个undefined reference，应该是32位程序和64位程序的签名不一样，导致连接失败。所以可以推断之前log4cplus应该也是用32位的g++编译出来的，在64位环境下无法使用。<br>之前也被relocation这个问题折磨的挺惨，好像也是编译log4cplus的时候。大概意思是link进行relocation时发生了截断。再直白点就是在64位机器上用64位编译器链接32位DLL，失败是理所当然的。</p>
+<p>我们不能光看到不好的那一面。在这个过程是，还是学习（复习）了一些东西。</p>
+<ul>
+<li><p>在configure时加入参数，指定编译版本</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">$ CXX=g++ CXXFLAGS=-m32 ./configure</div></pre></td></tr></table></figure>
+</li>
+<li><p>编译boost，指定某些library</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div></pre></td><td class="code"><pre><div class="line">$ ./b2 cxxflags=&apos;-std=gnu++11 -D__USE_W32_SOCKETS -D&quot;__MSABI_LONG(x)=(x)&quot; -fpermissive&apos;</div><div class="line">$ ./b2 --with-system #boost_system only</div></pre></td></tr></table></figure>
+</li>
+<li><p>Undefined reference to WinMain in Cygwin</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">对不起，你没有定义main函数。</div></pre></td></tr></table></figure>
+</li>
+<li><p>boost asio需要link boost_system和boost_thread</p>
+<figure class="highlight taggerscript"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">boost_1_64_0<span class="symbol">\b</span>in.v2<span class="symbol">\l</span>ibs<span class="symbol">\s</span>ystem<span class="symbol">\b</span>uild<span class="symbol">\g</span>cc-7.3.0<span class="symbol">\r</span>elease<span class="symbol">\t</span>hreading-multi，这里有DLL</div></pre></td></tr></table></figure>
+</li>
+<li><p>程序在cygwin terminal中可以运行，在CMD中报错</p>
+<figure class="highlight dos"><table><tr><td class="gutter"><pre><div class="line">1</div></pre></td><td class="code"><pre><div class="line">将缺失的DLL拷贝到运行目录，或<span class="built_in">PATH</span>下。</div></pre></td></tr></table></figure>
+</li>
+</ul>
+<h1 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h1><ul>
+<li><a href="https://www.boost.org/doc/libs/1_67_0/doc/html/boost_asio/using.html" target="_blank" rel="external">https://www.boost.org/doc/libs/1_67_0/doc/html/boost_asio/using.html</a></li>
+<li><a href="https://blog.csdn.net/u013097499/article/details/57042952" target="_blank" rel="external">https://blog.csdn.net/u013097499/article/details/57042952</a></li>
+<li><a href="https://stackoverflow.com/questions/23918318/undefined-reference-to-winmain-in-cygwin" target="_blank" rel="external">https://stackoverflow.com/questions/23918318/undefined-reference-to-winmain-in-cygwin</a></li>
+</ul>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/C/" rel="tag">#C++</a>
+          
+            <a href="/tags/Cygwin64/" rel="tag">#Cygwin64</a>
+          
+            <a href="/tags/Boost/" rel="tag">#Boost</a>
+          
+            <a href="/tags/Network/" rel="tag">#Network</a>
+          
+        </div>
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/10/16/20161016杂记/" rel="next" title="20161016杂记">
+                <i class="fa fa-chevron-left"></i> 20161016杂记
+              </a>
+            
+          </div>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+        
+<script>
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='http://bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2018/12/05/Cygwin64的一个兼容性问题/"
+           data-title="Cygwin64的一个兼容性问题" data-url="https://leobriliiant.github.io/2018/12/05/Cygwin64的一个兼容性问题/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel ">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/LeoBrilliant.png"
+               alt="LeoBrilliant" />
+          <p class="site-author-name" itemprop="name">LeoBrilliant</p>
+          <p class="site-description motion-element" itemprop="description"></p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">16</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">27</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/LeoBrilliant/" target="_blank" title="GitHub">
+                  
+                    <i class="fa fa-fw fa-github"></i>
+                  
+                  GitHub
+                </a>
+              </span>
+            
+              <span class="links-of-author-item">
+                <a href="http://weibo.com/leobrilliant" target="_blank" title="Weibo">
+                  
+                    <i class="fa fa-fw fa-weibo"></i>
+                  
+                  Weibo
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+      </section>
+
+      
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+            
+              
+            
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#参考文献"><span class="nav-number">1.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+          </div>
+        </section>
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">LeoBrilliant</span>
+</div>
+
+<div class="powered-by">
+  由 <a class="theme-link" href="http://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/vendors/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/vendors/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/vendors/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.0.1"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.0.1"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.0.1"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.0.1"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.0.1"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"LeoBrilliant"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    <script src="/vendors/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
